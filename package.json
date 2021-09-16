@@ -1,0 +1,26 @@
+{
+  "name": "consolite",
+  "version": "0.0.1",
+  "description": "Light wrapper for console",
+  "main": "esm/index.js",
+  "scripts": {
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakobrosenberg/consolite.git"
+  },
+  "keywords": [
+    "log",
+    "logging",
+    "debug",
+    "console",
+    "print"
+  ],
+  "author": "jakobrosenberg@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jakobrosenberg/consolite/issues"
+  },
+  "homepage": "https://github.com/jakobrosenberg/consolite#readme"
+}
