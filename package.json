@@ -1,11 +1,10 @@
 {
   "name": "consolite",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Light wrapper for console",
-  "main": "esm/index.js",
-  "scripts": {
-    
-  },
+  "main": "cjs/index.js",
+  "module": "esm/index.mjs",
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jakobrosenberg/consolite.git"
