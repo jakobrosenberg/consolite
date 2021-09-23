@@ -1,3 +1,14 @@
+/**
+* @typedef {Object} Logger 
+* @prop {createLogger} create Creates new logger.
+* @prop {createLogger} createChild Creates a child logger. Prefix will be inherited. Level and levels will be inherited if undefined.
+* @prop {createLogger} createParent Creates a parent logger. Prefix will be inherited. Level and levels will be inherited if undefined.
+* @prop {Object.<string, number>} levels
+* @prop {number} level
+* @prop {Logger} parent
+*/
+
+
 const defaults = {
   level: 3,
   levels: {
@@ -11,6 +22,7 @@ const defaults = {
 const noop = (x) => x;
 
 function createLogger(...prefix) {
+    /** @type {Logger & console} */
   const logger = {};
   const parent = (this && this.parent) || {};
   const _levels = parent.levels ? {} : defaults.levels;
