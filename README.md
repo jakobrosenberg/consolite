@@ -45,15 +45,17 @@ log.log('hello world') // prints "[parent] [child] hello world"
 ```javascript
 const log = createLog()
 
-log.debug('hello world') // prints "hello world"
-log.level = 3
 log.debug('hello world') // does nothing
+log.level = 4 // 3 by default
+log.debug('hello world') // prints "hello world"
+
 ```
 
 ### Changing default levels
 ```javascript
 const log = createLog()
-log.levels.debug = 3
 
+log.debug('hello world') // does nothing
+log.levels.debug = 3 // set debug to match current logging level
 log.debug('hello world') // prints "hello world"
 ```
