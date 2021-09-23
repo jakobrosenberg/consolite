@@ -1,5 +1,5 @@
 /**
- * eats process.stdout an returns array of strings
+ * eats process.stdout and returns an array of strings
  * @param {Function} callback 
  * @returns {string[]}
  */
