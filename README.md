@@ -1,10 +1,6 @@
-# consolite
+<img src="./consolite.svg" style="width:100%">
 
-#### Light wrapper for `console`
-
----
-
-### Why consolite
+### Features
 - **It's tiny** - 371 bytes gzip + minify.
 - **It preserves line numbers** - so you can find exactly where your code was logged.
 - **Prefixing** - provide context for your logs by adding a prefix.
@@ -31,18 +27,18 @@ log.log('hello world') // prints "hello world"
 
 #### Using prefix
 ```javascript
-const log = createLog('my-prefix')
+const log = createLog('[my-prefix]')
 
-log.log('hello world') // prints "my-prefix hello world"
+log.log('hello world') // prints "[my-prefix] hello world"
 ```
 
 #### Child logger
 Child loggers inherit prefixes, levels and level from their parents.
 ```javascript
-const log = createLog('parent')
-const childLog = log.createChild('child')
+const log = createLog('[parent]')
+const childLog = log.createChild('[child]')
 
-log.log('hello world') // prints "parent child hello world"
+log.log('hello world') // prints "[parent] [child] hello world"
 ```
 
 #### Changing log level
@@ -57,7 +53,6 @@ log.debug('hello world') // does nothing
 #### Changing default levels
 ```javascript
 const log = createLog()
-log.level = 3
 log.levels.debug = 3
 
 log.debug('hello world') // prints "hello world"
