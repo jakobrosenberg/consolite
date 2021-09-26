@@ -23,5 +23,15 @@
   "bugs": {
     "url": "https://github.com/jakobrosenberg/consolite/issues"
   },
-  "homepage": "https://github.com/jakobrosenberg/consolite#readme"
+  "homepage": "https://github.com/jakobrosenberg/consolite#readme",
+  "prettier": {
+    "singleQuote": true,
+    "quoteProps": "as-needed",
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "semi": false,
+    "useTabs": false,
+    "printWidth": 90
+  }
 }
