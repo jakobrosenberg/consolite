@@ -32,6 +32,7 @@ const noop = x => x
 // $& means the whole matched string
 const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
+const canBind = prop => typeof console[prop] === 'function'
 
 class Consolite {
   prefix = []
@@ -48,7 +49,7 @@ class Consolite {
       typeof this.filter === 'function'
         ? this.filter(prefix)
         : prefix.join('').match(escapeIfString(this.filter))
-    const shouldPrint = prop => withinLevel(prop) && passesFilter()
+    const shouldPrint = prop => withinLevel(prop) && passesFilter() && canBind(prop)
 
     // attach console methods
     Object.keys(console).forEach(prop =>
