@@ -34,7 +34,7 @@ log.log('hello world') // prints "[my-prefix] hello world"
 ### Using a function prefix
 ```javascript
 const log = createLog(method => `${method} ->`)
-log.debug(method => `${method} ->`) // prints "debug -> hello world"
+log.debug('hello world') // prints "debug -> hello world"
 ```
 
 
