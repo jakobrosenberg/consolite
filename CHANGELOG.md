@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/jakobrosenberg/consolite/compare/v0.2.3...v0.2.4) (2021-10-31)
+
+
+### Bug Fixes
+
+* update types and docs ([6346976](https://github.com/jakobrosenberg/consolite/commit/634697645900e0c8430384b3a08fed9eb85ad7b6))
+
 ### [0.2.3](https://github.com/jakobrosenberg/consolite/compare/v0.2.2...v0.2.3) (2021-10-31)
 
 
