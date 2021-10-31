@@ -107,9 +107,11 @@ class Consolite {
  * @param {string} method console method, eg. log, debug etc...
  */
 
+/** @typedef {Consolite & Console} ConsoliteLogger */
+
 /**
  * @param {(string|PrefixFn)[]} prefix
- * @returns {Consolite & Console}
+ * @returns {ConsoliteLogger}
  */
  const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
 
