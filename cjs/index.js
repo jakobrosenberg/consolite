@@ -115,5 +115,5 @@ class Consolite {
  */
  const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
 
- export { Consolite, createLogger }
+ module.exports = { Consolite, createLogger }
  
