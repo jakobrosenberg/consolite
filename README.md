@@ -30,8 +30,10 @@ log.log('hello world') // prints "hello world"
 const log = createLog('[my-prefix]')
 
 log.log('hello world') // prints "[my-prefix] hello world"
-
-/* Note, prefix can also be a function that accepts the console method as first parameter. */
+```
+### Using a function prefix
+```javascript
+const log = createLog(method => `${method} ->`)
 log.debug(method => `${method} ->`) // prints "debug -> hello world"
 ```
 
