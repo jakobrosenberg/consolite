@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/jakobrosenberg/consolite/compare/v0.2.6...v0.2.7) (2021-10-31)
+
+
+### Bug Fixes
+
+* cjs was broke ([2755aa0](https://github.com/jakobrosenberg/consolite/commit/2755aa0a1a4d63f48d8304203d9cc5febdb13206))
+
 ### [0.2.6](https://github.com/jakobrosenberg/consolite/compare/v0.2.5...v0.2.6) (2021-10-31)
 
 
