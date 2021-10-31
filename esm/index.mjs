@@ -54,7 +54,10 @@ class Consolite {
     // attach console methods
     Object.keys(console).forEach(prop =>
       Object.defineProperty(this, prop, {
-        get: () => (shouldPrint(prop) ? console[prop].bind(console, ...prefix) : noop),
+        get: () => {
+          const prefixes = prefix.map(p => typeof p === 'string' ? p : p(prop, this))
+          return shouldPrint(prop) ? console[prop].bind(console, ...prefixes) : noop
+        },
       }),
     )
   }

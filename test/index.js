@@ -102,3 +102,11 @@ test("can filter by function", () => {
   });
   assert.deepEqual(lines, ['main child show me', 'main child grandchild i can still post'])
 });
+
+test('can use functions for prefixes', ()=>{
+  const log = createLogger(method => `[${method.toUpperCase()}]`, '[im scope]');
+  const lines = stdNout(() => {
+    log.log("show me");    
+  });
+  assert.deepEqual(lines, ['[LOG] [im scope] show me'])
+})
