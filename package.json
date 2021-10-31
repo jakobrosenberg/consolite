@@ -10,6 +10,7 @@
       "import": "./esm/index.js"
     }
   },
+  "types": "./typings/index.d.ts",
   "scripts": {
     "test": "node ./test",
     "build": "npx tsc"

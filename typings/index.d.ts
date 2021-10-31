@@ -42,4 +42,3 @@ export class Consolite {
  * @returns {Consolite & Console}
  */
 export function createLogger(...prefix: string[]): Consolite & Console;
-export function hello(): void;
