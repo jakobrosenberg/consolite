@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "description": "Light wrapper for console",
   "main": "cjs/index.js",
-  "module": "esm/index.mjs",
+  "module": "esm/index.js",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js"
+    }
+  },
   "scripts": {
     "test": "node ./test"
   },
