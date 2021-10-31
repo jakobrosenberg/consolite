@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/jakobrosenberg/consolite/compare/v0.2.5...v0.2.6) (2021-10-31)
+
+
+### Bug Fixes
+
+* forgot types. Sorry Ghost >.< ([5c9033a](https://github.com/jakobrosenberg/consolite/commit/5c9033a21856902944f38ff6ae605320c21a9a1f))
+
 ### [0.2.5](https://github.com/jakobrosenberg/consolite/compare/v0.2.4...v0.2.5) (2021-10-31)
 
 
