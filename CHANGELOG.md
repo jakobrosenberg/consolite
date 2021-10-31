@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/jakobrosenberg/consolite/compare/v0.2.4...v0.2.5) (2021-10-31)
+
+
+### Bug Fixes
+
+* added compound type ([bdcaf63](https://github.com/jakobrosenberg/consolite/commit/bdcaf63afca3c6861d413749c6d951d0feb735b8))
+
 ### [0.2.4](https://github.com/jakobrosenberg/consolite/compare/v0.2.3...v0.2.4) (2021-10-31)
 
 
