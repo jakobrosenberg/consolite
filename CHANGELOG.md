@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/jakobrosenberg/consolite/compare/v0.2.0...v0.2.1) (2021-10-31)
+
+
+### Bug Fixes
+
+* remove "hello" from types ([d2e9c03](https://github.com/jakobrosenberg/consolite/commit/d2e9c035b1af03d8b73276169d3458cc12adfc66))
+
 ## 0.2.0 (2021-10-31)
 
 
