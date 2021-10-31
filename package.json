@@ -2,12 +2,12 @@
   "name": "consolite",
   "version": "0.2.1",
   "description": "Light wrapper for console",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.mjs",
   "exports": {
     ".": {
       "require": "./cjs/index.js",
-      "import": "./esm/index.js"
+      "import": "./esm/index.mjs"
     }
   },
   "types": "./typings/index.d.ts",
