@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "checkJs": true,
+        "allowJs": true,
+        "declaration": true,
+        "moduleResolution": "Node",
+        "rootDirs": ["."],
+        "target": "es6",
+        "declarationDir": "typings",
+        "emitDeclarationOnly": true,
+        "allowSyntheticDefaultImports": true
+    },
+    "include": ["cjs/*.js"],
+    "exclude": [
+        "**/node_modules/*",
+        "**/tmp/*",
+        "**/.history/*",
+        "**/spec",
+        "test",
+        "examples",
+        "site",
+        "jest.config.js"
+    ]
+}
