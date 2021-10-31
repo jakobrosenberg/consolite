@@ -3,15 +3,15 @@ export type Logger = {
     /**
      * Creates new logger.
      */
-    create: (...prefix: (string | PrefixFn)[]) => Consolite & Console;
+    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
     /**
      * Creates a child logger. Prefix will be inherited. Level and levels will be inherited if undefined.
      */
-    createChild: (...prefix: (string | PrefixFn)[]) => Consolite & Console;
+    createChild: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
     /**
      * Creates a parent logger. Prefix will be inherited. Level and levels will be inherited if undefined.
      */
-    createParent: (...prefix: (string | PrefixFn)[]) => Consolite & Console;
+    createParent: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
     levels: {
         [x: string]: number;
     };
@@ -21,6 +21,7 @@ export type Logger = {
     parent: Logger;
 };
 export type PrefixFn = (method: string) => any;
+export type ConsoliteLogger = Consolite & Console;
 export class Consolite {
     constructor(...prefix: any[]);
     prefix: any[];
@@ -34,16 +35,17 @@ export class Consolite {
     get filter(): any;
     get root(): any;
     levels: {};
-    createChild(...prefix: any[]): Consolite & Console;
-    createParent(...prefix: any[]): Consolite & Console;
-    create: (...prefix: (string | PrefixFn)[]) => Consolite & Console;
+    createChild(...prefix: any[]): ConsoliteLogger;
+    createParent(...prefix: any[]): ConsoliteLogger;
+    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
 }
 /**
  * @callback PrefixFn
  * @param {string} method console method, eg. log, debug etc...
  */
+/** @typedef {Consolite & Console} ConsoliteLogger */
 /**
  * @param {(string|PrefixFn)[]} prefix
- * @returns {Consolite & Console}
+ * @returns {ConsoliteLogger}
  */
-export function createLogger(...prefix: (string | PrefixFn)[]): Consolite & Console;
+export function createLogger(...prefix: (string | PrefixFn)[]): ConsoliteLogger;
