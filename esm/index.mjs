@@ -103,9 +103,15 @@ class Consolite {
 }
 
 /**
- * @param {string[]} prefix
+ * @callback PrefixFn
+ * @param {string} method console method, eg. log, debug etc...
+ */
+
+/**
+ * @param {(string|PrefixFn)[]} prefix
  * @returns {Consolite & Console}
  */
-const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
+ const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
 
-export { Consolite, createLogger }
+ export { Consolite, createLogger }
+ 

@@ -30,7 +30,11 @@ log.log('hello world') // prints "hello world"
 const log = createLog('[my-prefix]')
 
 log.log('hello world') // prints "[my-prefix] hello world"
+
+/* Note, prefix can also be a function that accepts the console method as first parameter. */
+log.debug(method => `${method} ->`) // prints "debug -> hello world"
 ```
+
 
 ### Child logger
 Child loggers inherit prefixes, levels and level from their parents.
