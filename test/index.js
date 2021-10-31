@@ -2,7 +2,7 @@ const { createLogger, Consolite } = require("../cjs");
 const assert = require("assert");
 const { test, stdNout } = require("./utils");
 
-const logger = new Consolite('main');
+const logger = createLogger('main');
 const childLogger = logger.createChild("child");
 const grandchildLogger = childLogger.createChild("grandchild");
 const parentLogger = logger.createParent("parent");
