@@ -1,6 +1,6 @@
-import { createLogger, Consolite } from "../esm/index.js"
+import { createLogger, Consolite } from "../esm/index.mjs"
 import assert from "assert";
-import { test, stdNout } from "./utils.js";
+import { test, stdNout } from "./utils.mjs";
 
 const logger = createLogger('main');
 const childLogger = logger.createChild("child");
