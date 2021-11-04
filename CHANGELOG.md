@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/jakobrosenberg/consolite/compare/v0.2.8...v0.2.9) (2021-11-04)
+
+
+### Bug Fixes
+
+* cjs regression error ([582f9af](https://github.com/jakobrosenberg/consolite/commit/582f9aff809433fb970a3f737bba5eefd3546853))
+
 ### [0.2.8](https://github.com/jakobrosenberg/consolite/compare/v0.2.7...v0.2.8) (2021-11-04)
 
 
