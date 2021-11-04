@@ -1,6 +1,6 @@
-const { createLogger, Consolite } = require("../cjs");
-const assert = require("assert");
-const { test, stdNout } = require("./utils");
+import { createLogger, Consolite } from "../esm/index.js"
+import assert from "assert";
+import { test, stdNout } from "./utils.js";
 
 const logger = createLogger('main');
 const childLogger = logger.createChild("child");
@@ -69,7 +69,7 @@ test("inherits defaults", () => {
   assert.deepEqual(lines, []);
 });
 
-test('new logger is its own root', ()=>{
+test('new logger is its own root', () => {
   assert.equal(logger.root, logger)
 })
 
@@ -78,7 +78,7 @@ test("children can find root", () => {
   assert.equal(grandchildLogger.root, logger);
 });
 
-test('new parent is its own root', ()=>{
+test('new parent is its own root', () => {
   assert.equal(parentLogger.root, parentLogger)
 })
 
@@ -103,10 +103,10 @@ test("can filter by function", () => {
   assert.deepEqual(lines, ['main child show me', 'main child grandchild i can still post'])
 });
 
-test('can use functions for prefixes', ()=>{  
+test('can use functions for prefixes', () => {
   const log = createLogger(method => `[${method.toUpperCase()}]`, '[im scope]');
   const lines = stdNout(() => {
-    log.log("show me");    
+    log.log("show me");
   });
   assert.deepEqual(lines, ['[LOG] [im scope] show me'])
 })

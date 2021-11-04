@@ -34,7 +34,7 @@ const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
 const canBind = prop => typeof console[prop] === 'function'
 
-class Consolite {
+export class Consolite {
   prefix = []
   _filter = null
   _level = null
@@ -113,7 +113,6 @@ class Consolite {
  * @param {(string|PrefixFn)[]} prefix
  * @returns {ConsoliteLogger}
  */
- const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
+export const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
 
- export { Consolite, createLogger }
  

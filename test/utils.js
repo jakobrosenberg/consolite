@@ -3,7 +3,7 @@
  * @param {Function} callback 
  * @returns {string[]}
  */
-const stdNout = callback => {
+export const stdNout = callback => {
     const lines = []
     const oldWrite = process.stdout.write
     process.stdout.write = function(string, encoding){
@@ -14,7 +14,7 @@ const stdNout = callback => {
     return lines.map(line => line.replace(/\n/, ''))
 }
 
-const test = (msg, cb) => {
+export const test = (msg, cb) => {
     try {
         cb()
         console.log(msg, '✅')
@@ -23,5 +23,3 @@ const test = (msg, cb) => {
         console.error(err)
     }
 }
-
-module.exports = {stdNout, test}

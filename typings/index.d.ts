@@ -1,3 +1,21 @@
+export class Consolite {
+    constructor(...prefix: any[]);
+    prefix: any[];
+    _filter: any;
+    _level: any;
+    _levels: {};
+    parent: any;
+    set level(arg: any);
+    get level(): any;
+    set filter(arg: any);
+    get filter(): any;
+    get root(): any;
+    levels: {};
+    createChild(...prefix: any[]): ConsoliteLogger;
+    createParent(...prefix: any[]): ConsoliteLogger;
+    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
+}
+export function createLogger(...prefix: (string | PrefixFn)[]): ConsoliteLogger;
 export type Filter = (prefixes: string[]) => any;
 export type Logger = {
     /**
@@ -22,30 +40,3 @@ export type Logger = {
 };
 export type PrefixFn = (method: string) => any;
 export type ConsoliteLogger = Consolite & Console;
-export class Consolite {
-    constructor(...prefix: any[]);
-    prefix: any[];
-    _filter: any;
-    _level: any;
-    _levels: {};
-    parent: any;
-    set level(arg: any);
-    get level(): any;
-    set filter(arg: any);
-    get filter(): any;
-    get root(): any;
-    levels: {};
-    createChild(...prefix: any[]): ConsoliteLogger;
-    createParent(...prefix: any[]): ConsoliteLogger;
-    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
-}
-/**
- * @callback PrefixFn
- * @param {string} method console method, eg. log, debug etc...
- */
-/** @typedef {Consolite & Console} ConsoliteLogger */
-/**
- * @param {(string|PrefixFn)[]} prefix
- * @returns {ConsoliteLogger}
- */
-export function createLogger(...prefix: (string | PrefixFn)[]): ConsoliteLogger;
