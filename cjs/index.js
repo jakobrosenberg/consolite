@@ -61,6 +61,10 @@ var defaults = {
 
 var noop = function noop(x) {
   return x;
+};
+
+var unique = function unique(v, i, a) {
+  return a.indexOf(v) === i;
 }; // $& means the whole matched string
 
 
@@ -70,10 +74,6 @@ var escapeRegExp = function escapeRegExp(str) {
 
 var escapeIfString = function escapeIfString(str) {
   return typeof str === 'string' ? escapeRegExp(str) : str;
-};
-
-var canBind = function canBind(prop) {
-  return typeof console[prop] === 'function';
 };
 
 var Consolite = /*#__PURE__*/function () {
@@ -98,10 +98,22 @@ var Consolite = /*#__PURE__*/function () {
     _defineProperty(this, "parent", null);
 
     _defineProperty(this, "levels", new Proxy(this._levels, {
-      get: function get(target, prop) {
-        var _this$parent, _this$parent2;
+      ownKeys: function ownKeys(target) {
+        var _this$parent;
 
-        return target[prop] || target["default"] || ((_this$parent = _this.parent) === null || _this$parent === void 0 ? void 0 : _this$parent.levels[prop]) || ((_this$parent2 = _this.parent) === null || _this$parent2 === void 0 ? void 0 : _this$parent2.levels["default"]) || defaults.levels[prop] || defaults.levels["default"];
+        return [].concat(_toConsumableArray(Object.keys(defaults.levels)), _toConsumableArray(Object.keys(((_this$parent = _this.parent) === null || _this$parent === void 0 ? void 0 : _this$parent.levels) || {})), _toConsumableArray(Reflect.ownKeys(target))).filter(unique);
+      },
+      getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, key) {
+        return {
+          value: target[key],
+          enumerable: true,
+          configurable: true
+        };
+      },
+      get: function get(target, prop) {
+        var _this$parent2, _this$parent3;
+
+        return target[prop] || target["default"] || ((_this$parent2 = _this.parent) === null || _this$parent2 === void 0 ? void 0 : _this$parent2.levels[prop]) || ((_this$parent3 = _this.parent) === null || _this$parent3 === void 0 ? void 0 : _this$parent3.levels["default"]) || defaults.levels[prop] || defaults.levels["default"];
       },
       set: function set(target, prop, value) {
         return target[prop] = value;
@@ -120,31 +132,31 @@ var Consolite = /*#__PURE__*/function () {
       return typeof _this.filter === 'function' ? _this.filter(prefix) : prefix.join('').match(escapeIfString(_this.filter));
     };
 
-    var shouldPrint = function shouldPrint(prop) {
-      return withinLevel(prop) && passesFilter() && canBind(prop);
+    this.register = function (prop, fn) {
+      return Object.defineProperty(_this, prop, {
+        get: function get() {
+          var canBind = typeof fn === 'function';
+          var shouldPrint = withinLevel(prop) && passesFilter() && canBind;
+          var prefixes = prefix.map(function (p) {
+            return typeof p === 'string' ? p : p(prop, _this);
+          });
+          return shouldPrint ? fn.bind.apply(fn, [console].concat(_toConsumableArray(prefixes))) : noop;
+        }
+      });
     }; // attach console methods
 
 
     Object.keys(console).forEach(function (prop) {
-      return Object.defineProperty(_this, prop, {
-        get: function get() {
-          var _console$prop;
-
-          var prefixes = prefix.map(function (p) {
-            return typeof p === 'string' ? p : p(prop, _this);
-          });
-          return shouldPrint(prop) ? (_console$prop = console[prop]).bind.apply(_console$prop, [console].concat(_toConsumableArray(prefixes))) : noop;
-        }
-      });
+      return _this.register(prop, console[prop]);
     });
   }
 
   _createClass(Consolite, [{
     key: "level",
     get: function get() {
-      var _ref, _this$_level, _this$parent3;
+      var _ref, _this$_level, _this$parent4;
 
-      return (_ref = (_this$_level = this._level) !== null && _this$_level !== void 0 ? _this$_level : (_this$parent3 = this.parent) === null || _this$parent3 === void 0 ? void 0 : _this$parent3.level) !== null && _ref !== void 0 ? _ref : defaults.level;
+      return (_ref = (_this$_level = this._level) !== null && _this$_level !== void 0 ? _this$_level : (_this$parent4 = this.parent) === null || _this$parent4 === void 0 ? void 0 : _this$parent4.level) !== null && _ref !== void 0 ? _ref : defaults.level;
     },
     set: function set(val) {
       this._level = val;
@@ -152,9 +164,9 @@ var Consolite = /*#__PURE__*/function () {
   }, {
     key: "filter",
     get: function get() {
-      var _ref2, _this$_filter, _this$parent4;
+      var _ref2, _this$_filter, _this$parent5;
 
-      return (_ref2 = (_this$_filter = this._filter) !== null && _this$_filter !== void 0 ? _this$_filter : (_this$parent4 = this.parent) === null || _this$parent4 === void 0 ? void 0 : _this$parent4.filter) !== null && _ref2 !== void 0 ? _ref2 : defaults.filter;
+      return (_ref2 = (_this$_filter = this._filter) !== null && _this$_filter !== void 0 ? _this$_filter : (_this$parent5 = this.parent) === null || _this$parent5 === void 0 ? void 0 : _this$parent5.filter) !== null && _ref2 !== void 0 ? _ref2 : defaults.filter;
     },
     set: function set(val) {
       this._filter = val;
@@ -162,9 +174,9 @@ var Consolite = /*#__PURE__*/function () {
   }, {
     key: "root",
     get: function get() {
-      var _this$parent5;
+      var _this$parent6;
 
-      return ((_this$parent5 = this.parent) === null || _this$parent5 === void 0 ? void 0 : _this$parent5.root) || this;
+      return ((_this$parent6 = this.parent) === null || _this$parent6 === void 0 ? void 0 : _this$parent6.root) || this;
     }
   }, {
     key: "createChild",

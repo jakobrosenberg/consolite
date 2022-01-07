@@ -28,11 +28,11 @@ const defaults = {
 }
 
 const noop = x => x
+const unique = (v, i, a) => a.indexOf(v) === i
 
 // $& means the whole matched string
 const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
-const canBind = prop => typeof console[prop] === 'function'
 
 export class Consolite {
   prefix = []
@@ -49,17 +49,20 @@ export class Consolite {
       typeof this.filter === 'function'
         ? this.filter(prefix)
         : prefix.join('').match(escapeIfString(this.filter))
-    const shouldPrint = prop => withinLevel(prop) && passesFilter() && canBind(prop)
 
-    // attach console methods
-    Object.keys(console).forEach(prop =>
+    this.register = (prop, fn) =>
       Object.defineProperty(this, prop, {
         get: () => {
-          const prefixes = prefix.map(p => typeof p === 'string' ? p : p(prop, this))
-          return shouldPrint(prop) ? console[prop].bind(console, ...prefixes) : noop
+          const canBind = typeof fn === 'function'
+          const shouldPrint = withinLevel(prop) && passesFilter() && canBind
+          const prefixes = prefix.map(p => (typeof p === 'string' ? p : p(prop, this)))
+
+          return shouldPrint ? fn.bind(console, ...prefixes) : noop
         },
-      }),
-    )
+      })
+    
+    // attach console methods
+    Object.keys(console).forEach(prop => this.register(prop, console[prop]))
   }
 
   get level() {
@@ -79,6 +82,17 @@ export class Consolite {
   }
 
   levels = new Proxy(this._levels, {
+    ownKeys: target =>
+      [
+        ...Object.keys(defaults.levels),
+        ...Object.keys(this.parent?.levels || {}),
+        ...Reflect.ownKeys(target),
+      ].filter(unique),
+    getOwnPropertyDescriptor: (target, key) => ({
+      value: target[key],
+      enumerable: true,
+      configurable: true,
+    }),
     get: (target, prop) =>
       target[prop] ||
       target.default ||
@@ -114,5 +128,3 @@ export class Consolite {
  * @returns {ConsoliteLogger}
  */
 export const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
-
- 

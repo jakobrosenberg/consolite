@@ -65,3 +65,11 @@ log.debug('hello world') // does nothing
 log.levels.debug = 3 // set debug to match current logging level
 log.debug('hello world') // prints "hello world"
 ```
+
+### Adding custom method
+```javascript
+const log = createLog()
+log.register('silly', console.log)
+log.levels.silly = 8
+log.silly('hello world')
+```

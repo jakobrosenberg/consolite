@@ -5,6 +5,7 @@ export class Consolite {
     _level: any;
     _levels: {};
     parent: any;
+    register: (prop: any, fn: any) => Consolite;
     set level(arg: any);
     get level(): any;
     set filter(arg: any);
