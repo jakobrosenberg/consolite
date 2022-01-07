@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.10](https://github.com/jakobrosenberg/consolite/compare/v0.2.9...v0.2.10) (2022-01-07)
+
+
+### Features
+
+* added register method ([c6b6da9](https://github.com/jakobrosenberg/consolite/commit/c6b6da920c124e89b8fafb628bcaa5fd86e2474c))
+
 ### [0.2.9](https://github.com/jakobrosenberg/consolite/compare/v0.2.8...v0.2.9) (2021-11-04)
 
 
