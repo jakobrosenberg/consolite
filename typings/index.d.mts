@@ -29,14 +29,16 @@ export type Logger = {
 export type PrefixFn = (method: string | symbol) => any;
 export type ConsoliteLogger = ExtendConsole & Console;
 declare class ExtendConsole {
-    constructor(...prefix: any[]);
-    prefix: any[];
+    constructor(parent: any, prefix: any);
     _filter: any;
     _level: any;
     _levels: {};
-    parent: any;
+    _prefix: any[];
     logMethods: Console;
+    parent: any;
     register(name: any, fn: any): void;
+    set prefix(arg: any[]);
+    get prefix(): any[];
     set level(arg: any);
     get level(): any;
     set filter(arg: any);
@@ -45,7 +47,6 @@ declare class ExtendConsole {
     get root(): any;
     levels: {};
     createChild(...prefix: any[]): ConsoliteLogger;
-    createParent(...prefix: any[]): ConsoliteLogger;
     create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
 }
 export {};

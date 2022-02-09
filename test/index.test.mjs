@@ -5,7 +5,10 @@ import { stdNout } from './utils.mjs'
 const logger = createLogger('main')
 const childLogger = logger.createChild('child')
 const grandchildLogger = childLogger.createChild('grandchild')
-const parentLogger = logger.createParent('parent')
+
+test('has prefix', () => {
+  assert.deepEqual(logger._prefix, ['main'])
+})
 
 test('can create logger', () => {
   const lines = stdNout(() => {
@@ -19,13 +22,6 @@ test('can create child logger', () => {
     childLogger.log('foo bar')
   })
   assert.deepEqual(lines, ['main child foo bar'])
-})
-
-test('can create parent logger', () => {
-  const lines = stdNout(() => {
-    parentLogger.log('foo bar')
-  })
-  assert.deepEqual(lines, ['parent main foo bar'])
 })
 
 test('can set level', () => {
@@ -77,10 +73,6 @@ test('new logger is its own root', ctx => {
 test('children can find root', () => {
   assert.equal(childLogger.root, logger.__self)
   assert.equal(grandchildLogger.root, logger.__self)
-})
-
-test('new parent is its own root', () => {
-  assert.equal(parentLogger.root, parentLogger.__self)
 })
 
 test('can filter by string', () => {
@@ -155,4 +147,29 @@ test('can inherit custom methods', () => {
     childLogger.silly("I'm visible")
   })
   assert.deepEqual(lines, ["main I'm visible", "main child I'm visible"])
+})
+
+test('can create custom methods with setter', () => {
+  logger.logFromSetter = console.log
+
+  const lines = stdNout(() => logger.logFromSetter("I'm visible"))
+  assert.deepEqual(lines, ["main I'm visible"])
+})
+
+test('can inherit custom methods from getter', () => {
+  const lines = stdNout(() => {
+    logger.logFromSetter("I'm visible")
+    childLogger.logFromSetter("I'm visible")
+  })
+  assert.deepEqual(lines, ["main I'm visible", "main child I'm visible"])
+})
+
+test('parents dont inherit log methods from children', () => {
+  childLogger.logFromChild = console.log
+  assert(childLogger.logFromChild)
+  assert(!logger.logFromChild)
+})
+
+test('loggers can destructure own and parent log methods', () => {
+  assert(Object.keys(grandchildLogger).includes('logFromChild'))
 })

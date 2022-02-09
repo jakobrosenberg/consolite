@@ -5,12 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createProxy = exports.createLogger = exports.Consolite = void 0;
 
-function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -77,13 +71,10 @@ var escapeIfString = function escapeIfString(str) {
 };
 
 var ExtendConsole = /*#__PURE__*/function () {
-  function ExtendConsole() {
-    var _this = this,
-        _this$prefix;
+  function ExtendConsole(parent, prefix) {
+    var _this = this;
 
     _classCallCheck(this, ExtendConsole);
-
-    _defineProperty(this, "prefix", []);
 
     _defineProperty(this, "_filter", null);
 
@@ -91,9 +82,11 @@ var ExtendConsole = /*#__PURE__*/function () {
 
     _defineProperty(this, "_levels", {});
 
-    _defineProperty(this, "parent", null);
+    _defineProperty(this, "_prefix", []);
 
-    _defineProperty(this, "logMethods", console);
+    _defineProperty(this, "logMethods",
+    /** @type {Console} */
+    {});
 
     _defineProperty(this, "levels", new Proxy(this._levels, {
       ownKeys: function ownKeys(target) {
@@ -120,13 +113,45 @@ var ExtendConsole = /*#__PURE__*/function () {
 
     _defineProperty(this, "create", createLogger);
 
-    (_this$prefix = this.prefix).push.apply(_this$prefix, arguments);
+    this.parent = parent;
+    if (!parent) this.logMethods = console;
+    this._prefix = prefix;
+    Object.defineProperties(this, {
+      _filter: {
+        enumerable: false
+      },
+      _level: {
+        enumerable: false
+      },
+      _levels: {
+        enumerable: false
+      },
+      _prefix: {
+        enumerable: false
+      }
+    });
   }
 
   _createClass(ExtendConsole, [{
     key: "register",
     value: function register(name, fn) {
       this.logMethods[name] = fn;
+    }
+  }, {
+    key: "prefix",
+    get: function get() {
+      var parent = this;
+
+      var accumulatedPrefixes = _toConsumableArray(this._prefix);
+
+      while (parent = parent.parent) {
+        accumulatedPrefixes.unshift.apply(accumulatedPrefixes, _toConsumableArray(parent._prefix));
+      }
+
+      return accumulatedPrefixes;
+    },
+    set: function set(value) {
+      this._prefix = Array.isArray(value) ? value : [value];
     }
   }, {
     key: "level",
@@ -168,18 +193,7 @@ var ExtendConsole = /*#__PURE__*/function () {
         prefix[_key] = arguments[_key];
       }
 
-      var child = createLogger.apply(void 0, _toConsumableArray(this.prefix).concat(prefix));
-      child.parent = this;
-      return child;
-    }
-  }, {
-    key: "createParent",
-    value: function createParent() {
-      for (var _len2 = arguments.length, prefix = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        prefix[_key2] = arguments[_key2];
-      }
-
-      return createProxy(this, [].concat(prefix, _toConsumableArray(this.prefix)));
+      return createProxy(this, prefix);
     }
   }]);
 
@@ -194,8 +208,7 @@ var ExtendConsole = /*#__PURE__*/function () {
 
 
 var createProxy = function createProxy(parent, prefix) {
-  var extendedConsole = _construct(ExtendConsole, _toConsumableArray(prefix));
-
+  var extendedConsole = new ExtendConsole(parent, prefix);
   var proxy =
   /** @type {ConsoliteLogger} */
   new Proxy(extendedConsole, {
@@ -219,15 +232,38 @@ var createProxy = function createProxy(parent, prefix) {
         };
 
         var passesFilter = function passesFilter() {
-          return typeof target.filter === 'function' ? target.filter(prefix) : prefix.join('').match(escapeIfString(target.filter));
+          return typeof target.filter === 'function' ? target.filter(target.prefix) : target.prefix.join('').match(escapeIfString(target.filter));
         };
 
         var canBind = typeof fn === 'function';
         var shouldPrint = withinLevel(prop) && passesFilter() && canBind;
-        var prefixes = prefix.map(function (p) {
+        var prefixes = target.prefix.map(function (p) {
           return typeof p === 'string' ? p : p(prop);
         });
         return shouldPrint ? (_fn = fn).bind.apply(_fn, [console].concat(_toConsumableArray(prefixes))) : noop;
+      }
+    },
+    set: function set(target, prop, value) {
+      if (Reflect.has(target, prop)) target[prop] = value;else if (value instanceof Function) target.logMethods[prop] = value;else return false;
+      return true;
+    },
+    ownKeys: function ownKeys(target) {
+      var keys = [].concat(_toConsumableArray(Reflect.ownKeys(target)), _toConsumableArray(Reflect.ownKeys(target.logMethods)));
+      var parent = target;
+
+      while (parent = parent.parent) {
+        keys.push.apply(keys, _toConsumableArray(Reflect.ownKeys(parent.logMethods)));
+      }
+
+      return keys;
+    },
+    getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, prop) {
+      if (Reflect.get(target, prop)) return Object.getOwnPropertyDescriptor(target, prop);
+      var parent = target;
+
+      while (parent) {
+        if (Reflect.get(parent.logMethods, prop)) return Object.getOwnPropertyDescriptor(parent.logMethods, prop);
+        parent = parent.parent;
       }
     }
   });
@@ -249,8 +285,8 @@ var createProxy = function createProxy(parent, prefix) {
 exports.createProxy = createProxy;
 
 var createLogger = function createLogger() {
-  for (var _len3 = arguments.length, prefix = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    prefix[_key3] = arguments[_key3];
+  for (var _len2 = arguments.length, prefix = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    prefix[_key2] = arguments[_key2];
   }
 
   return createProxy(null, prefix);

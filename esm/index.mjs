@@ -35,19 +35,37 @@ const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
 
 class ExtendConsole {
-  prefix = []
   _filter = null
   _level = null
   _levels = {}
-  parent = null
-  logMethods = console
+  _prefix = []
+  logMethods = /** @type {Console} */ ({})
 
-  constructor(...prefix) {
-    this.prefix.push(...prefix)
+  constructor(parent, prefix) {
+    this.parent = parent
+    if (!parent) this.logMethods = console
+    this._prefix = prefix
+    Object.defineProperties(this, {
+      _filter: { enumerable: false },
+      _level: { enumerable: false },
+      _levels: { enumerable: false },
+      _prefix: { enumerable: false },
+    })
   }
 
   register(name, fn) {
     this.logMethods[name] = fn
+  }
+
+  get prefix() {
+    let parent = this
+    const accumulatedPrefixes = [...this._prefix]
+    while ((parent = parent.parent)) accumulatedPrefixes.unshift(...parent._prefix)
+    return accumulatedPrefixes
+  }
+
+  set prefix(value) {
+    this._prefix = Array.isArray(value) ? value : [value]
   }
 
   get level() {
@@ -93,13 +111,7 @@ class ExtendConsole {
   })
 
   createChild(...prefix) {
-    const child = createLogger(...this.prefix, ...prefix)
-    child.parent = this
-    return child
-  }
-
-  createParent(...prefix) {
-    return createProxy(this, [...prefix, ...this.prefix])
+    return createProxy(this, prefix)
   }
 
   create = createLogger
@@ -112,7 +124,7 @@ class ExtendConsole {
  * @returns {ConsoliteLogger}
  */
 export const createProxy = (parent, prefix) => {
-  const extendedConsole = new ExtendConsole(...prefix)
+  const extendedConsole = new ExtendConsole(parent, prefix)
   const proxy = /** @type {ConsoliteLogger} */ (
     new Proxy(extendedConsole, {
       get(target, prop) {
@@ -129,14 +141,37 @@ export const createProxy = (parent, prefix) => {
           const withinLevel = prop => target.levels[prop] <= target.level
           const passesFilter = () =>
             typeof target.filter === 'function'
-              ? target.filter(prefix)
-              : prefix.join('').match(escapeIfString(target.filter))
+              ? target.filter(target.prefix)
+              : target.prefix.join('').match(escapeIfString(target.filter))
 
           const canBind = typeof fn === 'function'
           const shouldPrint = withinLevel(prop) && passesFilter() && canBind
-          const prefixes = prefix.map(p => (typeof p === 'string' ? p : p(prop)))
+          const prefixes = target.prefix.map(p => (typeof p === 'string' ? p : p(prop)))
 
           return shouldPrint ? fn.bind(console, ...prefixes) : noop
+        }
+      },
+      set(target, prop, value) {
+        if (Reflect.has(target, prop)) target[prop] = value
+        else if (value instanceof Function) target.logMethods[prop] = value
+        else return false
+        return true
+      },
+      ownKeys(target) {
+        const keys = [...Reflect.ownKeys(target), ...Reflect.ownKeys(target.logMethods)]
+        let parent = target
+        while ((parent = parent.parent)) keys.push(...Reflect.ownKeys(parent.logMethods))
+        return keys
+      },
+      getOwnPropertyDescriptor(target, prop) {
+        if (Reflect.get(target, prop))
+          return Object.getOwnPropertyDescriptor(target, prop)
+
+        let parent = target
+        while (parent) {
+          if (Reflect.get(parent.logMethods, prop))
+            return Object.getOwnPropertyDescriptor(parent.logMethods, prop)
+          parent = parent.parent
         }
       },
     })
