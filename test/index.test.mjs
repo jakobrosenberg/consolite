@@ -174,3 +174,11 @@ test('parents dont inherit log methods from children', () => {
 test('loggers can destructure own and parent log methods', () => {
   assert(Object.keys(grandchildLogger).includes('logFromChild'))
 })
+
+test('can use delimiters', () => {
+  logger.delimiter = '>'
+  const lines = stdNout(() => {
+    grandchildLogger.log('hello')
+  })
+  assert.deepEqual(lines, ['main > child > grandchild > hello'])
+})

@@ -1,3 +1,5 @@
+// todo delimiter
+
 /**
  * @callback Filter
  * @param {string[]} prefixes
@@ -39,6 +41,7 @@ class ExtendConsole {
   _level = null
   _levels = {}
   _prefix = []
+  _delimiter = null
   logMethods = /** @type {Console} */ ({})
 
   constructor(parent, prefix) {
@@ -77,6 +80,23 @@ class ExtendConsole {
     return accumulatedPrefixes
   }
 
+  get formattedPrefixes() {
+    if (!this.delimiter) return this.prefix
+    else {
+      const prefixes = []
+      this.prefix.forEach(prefix => prefixes.push(prefix, this.delimiter))
+      return prefixes
+    }
+  }
+
+  get delimiter() {
+    return this.getNearest('_delimiter')
+  }
+
+  set delimiter(value) {
+    this._delimiter = value
+  }
+
   set prefix(value) {
     this._prefix = Array.isArray(value) ? value : [value]
   }
@@ -102,6 +122,7 @@ class ExtendConsole {
   }
 
   levels = new Proxy(this._levels, {
+    // todo could be cleaner. Might not need proxy
     ownKeys: target =>
       [
         ...Object.keys(defaults.levels),
@@ -154,7 +175,7 @@ export const createProxy = (parent, prefix) => {
 
           const canBind = typeof fn === 'function'
           const shouldPrint = withinLevel(prop) && passesFilter() && canBind
-          const prefixes = target.prefix.map(p => (typeof p === 'string' ? p : p(prop)))
+          const prefixes = target.formattedPrefixes.map(p => (typeof p === 'string' ? p : p(prop)))
 
           return shouldPrint ? fn.bind(console, ...prefixes) : noop
         }
