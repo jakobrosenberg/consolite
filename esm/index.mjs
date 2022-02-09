@@ -57,6 +57,19 @@ class ExtendConsole {
     this.logMethods[name] = fn
   }
 
+  /**
+   * get prop from self or nearest ancestor
+   * @template T
+   * @param {(((T)=>{})|string|symbol)} cb
+   */
+  getNearest(cb) {
+    const fn = typeof cb === 'string' || typeof cb === 'symbol' ? x => x[cb] : cb
+    const result = fn(this)
+    return result !== null && result !== undefined
+      ? result
+      : this.parent && this.parent.getNearest(fn)
+  }
+
   get prefix() {
     let parent = this
     const accumulatedPrefixes = [...this._prefix]
@@ -69,13 +82,13 @@ class ExtendConsole {
   }
 
   get level() {
-    return this._level ?? this.parent?.level ?? defaults.level
+    return this.getNearest('_level') ?? defaults.level
   }
   set level(val) {
     this._level = val
   }
   get filter() {
-    return this._filter ?? this.parent?.filter ?? defaults.filter
+    return this.getNearest('_filter') ?? defaults.filter
   }
   set filter(val) {
     this._filter = val
@@ -130,12 +143,7 @@ export const createProxy = (parent, prefix) => {
       get(target, prop) {
         if (Reflect.has(target, prop)) return Reflect.get(target, prop)
 
-        let fnContext = target
-        let fn = target.logMethods[prop]
-        while (!fn && fnContext) {
-          fnContext = fnContext.parent
-          fn = fnContext?.logMethods[prop]
-        }
+        const fn = target.getNearest(t => t.logMethods[prop])
 
         if (fn) {
           const withinLevel = prop => target.levels[prop] <= target.level
@@ -167,12 +175,10 @@ export const createProxy = (parent, prefix) => {
         if (Reflect.get(target, prop))
           return Object.getOwnPropertyDescriptor(target, prop)
 
-        let parent = target
-        while (parent) {
-          if (Reflect.get(parent.logMethods, prop))
-            return Object.getOwnPropertyDescriptor(parent.logMethods, prop)
-          parent = parent.parent
-        }
+        return (
+          parent.getNearest(t => Object.getOwnPropertyDescriptor(t.logMethods, prop)) ||
+          undefined
+        )
       },
     })
   )

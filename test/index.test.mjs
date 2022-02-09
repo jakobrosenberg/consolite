@@ -30,6 +30,7 @@ test('can set level', () => {
     logger.level = 4
     logger.debug('do show')
   })
+  assert.equal(logger._level, 4)
   assert.deepEqual(lines, ['main do show'])
 })
 
