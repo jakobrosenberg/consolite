@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createLogger = exports.Consolite = void 0;
+exports.createProxy = exports.createLogger = exports.Consolite = void 0;
 
 function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
 
@@ -76,16 +76,12 @@ var escapeIfString = function escapeIfString(str) {
   return typeof str === 'string' ? escapeRegExp(str) : str;
 };
 
-var Consolite = /*#__PURE__*/function () {
-  function Consolite() {
+var ExtendConsole = /*#__PURE__*/function () {
+  function ExtendConsole() {
     var _this = this,
         _this$prefix;
 
-    for (var _len = arguments.length, prefix = new Array(_len), _key = 0; _key < _len; _key++) {
-      prefix[_key] = arguments[_key];
-    }
-
-    _classCallCheck(this, Consolite);
+    _classCallCheck(this, ExtendConsole);
 
     _defineProperty(this, "prefix", []);
 
@@ -96,6 +92,8 @@ var Consolite = /*#__PURE__*/function () {
     _defineProperty(this, "_levels", {});
 
     _defineProperty(this, "parent", null);
+
+    _defineProperty(this, "logMethods", console);
 
     _defineProperty(this, "levels", new Proxy(this._levels, {
       ownKeys: function ownKeys(target) {
@@ -122,36 +120,15 @@ var Consolite = /*#__PURE__*/function () {
 
     _defineProperty(this, "create", createLogger);
 
-    (_this$prefix = this.prefix).push.apply(_this$prefix, prefix);
-
-    var withinLevel = function withinLevel(prop) {
-      return _this.levels[prop] <= _this.level;
-    };
-
-    var passesFilter = function passesFilter() {
-      return typeof _this.filter === 'function' ? _this.filter(prefix) : prefix.join('').match(escapeIfString(_this.filter));
-    };
-
-    this.register = function (prop, fn) {
-      return Object.defineProperty(_this, prop, {
-        get: function get() {
-          var canBind = typeof fn === 'function';
-          var shouldPrint = withinLevel(prop) && passesFilter() && canBind;
-          var prefixes = prefix.map(function (p) {
-            return typeof p === 'string' ? p : p(prop, _this);
-          });
-          return shouldPrint ? fn.bind.apply(fn, [console].concat(_toConsumableArray(prefixes))) : noop;
-        }
-      });
-    }; // attach console methods
-
-
-    Object.keys(console).forEach(function (prop) {
-      return _this.register(prop, console[prop]);
-    });
+    (_this$prefix = this.prefix).push.apply(_this$prefix, arguments);
   }
 
-  _createClass(Consolite, [{
+  _createClass(ExtendConsole, [{
+    key: "register",
+    value: function register(name, fn) {
+      this.logMethods[name] = fn;
+    }
+  }, {
     key: "level",
     get: function get() {
       var _ref, _this$_level, _this$parent4;
@@ -172,6 +149,12 @@ var Consolite = /*#__PURE__*/function () {
       this._filter = val;
     }
   }, {
+    key: "__self",
+    get: function get() {
+      // logger = proxied object, logger.__self = original object
+      return this;
+    }
+  }, {
     key: "root",
     get: function get() {
       var _this$parent6;
@@ -181,8 +164,8 @@ var Consolite = /*#__PURE__*/function () {
   }, {
     key: "createChild",
     value: function createChild() {
-      for (var _len2 = arguments.length, prefix = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        prefix[_key2] = arguments[_key2];
+      for (var _len = arguments.length, prefix = new Array(_len), _key = 0; _key < _len; _key++) {
+        prefix[_key] = arguments[_key];
       }
 
       var child = createLogger.apply(void 0, _toConsumableArray(this.prefix).concat(prefix));
@@ -192,22 +175,70 @@ var Consolite = /*#__PURE__*/function () {
   }, {
     key: "createParent",
     value: function createParent() {
-      for (var _len3 = arguments.length, prefix = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        prefix[_key3] = arguments[_key3];
+      for (var _len2 = arguments.length, prefix = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        prefix[_key2] = arguments[_key2];
       }
 
-      return createLogger.apply(void 0, prefix.concat(_toConsumableArray(this.prefix)));
+      return createProxy(this, [].concat(prefix, _toConsumableArray(this.prefix)));
     }
   }]);
 
-  return Consolite;
+  return ExtendConsole;
 }();
 /**
- * @callback PrefixFn
- * @param {string} method console method, eg. log, debug etc...
+ *
+ * @param {ExtendConsole} parent
+ * @param {(string|PrefixFn)[]} prefix
+ * @returns {ConsoliteLogger}
  */
 
-/** @typedef {Consolite & Console} ConsoliteLogger */
+
+var createProxy = function createProxy(parent, prefix) {
+  var extendedConsole = _construct(ExtendConsole, _toConsumableArray(prefix));
+
+  var proxy =
+  /** @type {ConsoliteLogger} */
+  new Proxy(extendedConsole, {
+    get: function get(target, prop) {
+      if (Reflect.has(target, prop)) return Reflect.get(target, prop);
+      var fnContext = target;
+      var fn = target.logMethods[prop];
+
+      while (!fn && fnContext) {
+        var _fnContext;
+
+        fnContext = fnContext.parent;
+        fn = (_fnContext = fnContext) === null || _fnContext === void 0 ? void 0 : _fnContext.logMethods[prop];
+      }
+
+      if (fn) {
+        var _fn;
+
+        var withinLevel = function withinLevel(prop) {
+          return target.levels[prop] <= target.level;
+        };
+
+        var passesFilter = function passesFilter() {
+          return typeof target.filter === 'function' ? target.filter(prefix) : prefix.join('').match(escapeIfString(target.filter));
+        };
+
+        var canBind = typeof fn === 'function';
+        var shouldPrint = withinLevel(prop) && passesFilter() && canBind;
+        var prefixes = prefix.map(function (p) {
+          return typeof p === 'string' ? p : p(prop);
+        });
+        return shouldPrint ? (_fn = fn).bind.apply(_fn, [console].concat(_toConsumableArray(prefixes))) : noop;
+      }
+    }
+  });
+  return proxy;
+};
+/**
+ * @callback PrefixFn
+ * @param {string|symbol} method console method, eg. log, debug etc...
+ */
+
+/** @typedef {ExtendConsole & Console} ConsoliteLogger */
 
 /**
  * @param {(string|PrefixFn)[]} prefix
@@ -215,15 +246,25 @@ var Consolite = /*#__PURE__*/function () {
  */
 
 
-exports.Consolite = Consolite;
+exports.createProxy = createProxy;
 
 var createLogger = function createLogger() {
-  for (var _len4 = arguments.length, prefix = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    prefix[_key4] = arguments[_key4];
+  for (var _len3 = arguments.length, prefix = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    prefix[_key3] = arguments[_key3];
   }
 
-  return Object.assign(_construct(Consolite, prefix));
+  return createProxy(null, prefix);
 };
+/** @type {ConsoliteLogger} */
+
 
 exports.createLogger = createLogger;
+
+var Consolite = function Consolite() {
+  _classCallCheck(this, Consolite);
+
+  return createLogger.apply(void 0, arguments);
+};
+
+exports.Consolite = Consolite;
 //# sourceMappingURL=index.js.map

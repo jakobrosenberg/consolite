@@ -1,6 +1,6 @@
 import { createLogger, Consolite } from '../esm/index.mjs'
 import assert from 'assert'
-import { test, stdNout } from './utils.mjs'
+import { stdNout } from './utils.mjs'
 
 const logger = createLogger('main')
 const childLogger = logger.createChild('child')
@@ -70,17 +70,17 @@ test('inherits defaults', () => {
   assert.deepEqual(lines, [])
 })
 
-test('new logger is its own root', () => {
-  assert.equal(logger.root, logger)
+test('new logger is its own root', ctx => {
+  assert.equal(logger.root, logger.__self)
 })
 
 test('children can find root', () => {
-  assert.equal(childLogger.root, logger)
-  assert.equal(grandchildLogger.root, logger)
+  assert.equal(childLogger.root, logger.__self)
+  assert.equal(grandchildLogger.root, logger.__self)
 })
 
 test('new parent is its own root', () => {
-  assert.equal(parentLogger.root, parentLogger)
+  assert.equal(parentLogger.root, parentLogger.__self)
 })
 
 test('can filter by string', () => {
@@ -136,15 +136,23 @@ test('levels can be returns with spread operator', () => {
 })
 
 test('can create custom methods', () => {
-  childLogger.register('silly', console.log)
-  childLogger.levels.silly = 1
+  logger.register('silly', console.log)
+  logger.levels.silly = 1
 
   const lines = stdNout(() => {
-    childLogger.silly("I'm visible")
-    childLogger.levels.silly = 10
-    childLogger.silly("I'm hidden")
-    childLogger.levels.silly = 1
+    logger.silly("I'm visible")
+    logger.levels.silly = 10
+    logger.silly("I'm hidden")
+    logger.levels.silly = 1
+    logger.silly("I'm visible")
+  })
+  assert.deepEqual(lines, ["main I'm visible", "main I'm visible"])
+})
+
+test('can inherit custom methods', () => {
+  const lines = stdNout(() => {
+    logger.silly("I'm visible")
     childLogger.silly("I'm visible")
   })
-  assert.deepEqual(lines, ["main child I'm visible", "main child I'm visible"])
+  assert.deepEqual(lines, ["main I'm visible", "main child I'm visible"])
 })

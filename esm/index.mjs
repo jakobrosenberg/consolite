@@ -34,35 +34,20 @@ const unique = (v, i, a) => a.indexOf(v) === i
 const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
 
-export class Consolite {
+class ExtendConsole {
   prefix = []
   _filter = null
   _level = null
   _levels = {}
   parent = null
+  logMethods = console
 
   constructor(...prefix) {
     this.prefix.push(...prefix)
+  }
 
-    const withinLevel = prop => this.levels[prop] <= this.level
-    const passesFilter = () =>
-      typeof this.filter === 'function'
-        ? this.filter(prefix)
-        : prefix.join('').match(escapeIfString(this.filter))
-
-    this.register = (prop, fn) =>
-      Object.defineProperty(this, prop, {
-        get: () => {
-          const canBind = typeof fn === 'function'
-          const shouldPrint = withinLevel(prop) && passesFilter() && canBind
-          const prefixes = prefix.map(p => (typeof p === 'string' ? p : p(prop, this)))
-
-          return shouldPrint ? fn.bind(console, ...prefixes) : noop
-        },
-      })
-    
-    // attach console methods
-    Object.keys(console).forEach(prop => this.register(prop, console[prop]))
+  register(name, fn) {
+    this.logMethods[name] = fn
   }
 
   get level() {
@@ -76,6 +61,10 @@ export class Consolite {
   }
   set filter(val) {
     this._filter = val
+  }
+  get __self() {
+    // logger = proxied object, logger.__self = original object
+    return this
   }
   get root() {
     return this.parent?.root || this
@@ -110,21 +99,69 @@ export class Consolite {
   }
 
   createParent(...prefix) {
-    return createLogger(...prefix, ...this.prefix)
+    return createProxy(this, [...prefix, ...this.prefix])
   }
 
   create = createLogger
 }
 
 /**
+ *
+ * @param {ExtendConsole} parent
+ * @param {(string|PrefixFn)[]} prefix
+ * @returns {ConsoliteLogger}
+ */
+export const createProxy = (parent, prefix) => {
+  const extendedConsole = new ExtendConsole(...prefix)
+  const proxy = /** @type {ConsoliteLogger} */ (
+    new Proxy(extendedConsole, {
+      get(target, prop) {
+        if (Reflect.has(target, prop)) return Reflect.get(target, prop)
+
+        let fnContext = target
+        let fn = target.logMethods[prop]
+        while (!fn && fnContext) {
+          fnContext = fnContext.parent
+          fn = fnContext?.logMethods[prop]
+        }
+
+        if (fn) {
+          const withinLevel = prop => target.levels[prop] <= target.level
+          const passesFilter = () =>
+            typeof target.filter === 'function'
+              ? target.filter(prefix)
+              : prefix.join('').match(escapeIfString(target.filter))
+
+          const canBind = typeof fn === 'function'
+          const shouldPrint = withinLevel(prop) && passesFilter() && canBind
+          const prefixes = prefix.map(p => (typeof p === 'string' ? p : p(prop)))
+
+          return shouldPrint ? fn.bind(console, ...prefixes) : noop
+        }
+      },
+    })
+  )
+  return proxy
+}
+
+/**
  * @callback PrefixFn
- * @param {string} method console method, eg. log, debug etc...
+ * @param {string|symbol} method console method, eg. log, debug etc...
  */
 
-/** @typedef {Consolite & Console} ConsoliteLogger */
+/** @typedef {ExtendConsole & Console} ConsoliteLogger */
 
 /**
  * @param {(string|PrefixFn)[]} prefix
  * @returns {ConsoliteLogger}
  */
-export const createLogger = (...prefix) => Object.assign(new Consolite(...prefix))
+export const createLogger = (...prefix) => {
+  return createProxy(null, prefix)
+}
+
+/** @type {ConsoliteLogger} */
+export class Consolite {
+  constructor(...prefix) {
+    return createLogger(...prefix)
+  }
+}
