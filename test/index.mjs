@@ -37,80 +37,86 @@ test('can set level', () => {
   assert.deepEqual(lines, ['main do show'])
 })
 
-test("inherits level", () => {
+test('inherits level', () => {
   const lines = stdNout(() => {
-    childLogger.debug("do show");
-  });
-  assert.deepEqual(lines, ["main child do show"]);
-});
+    childLogger.debug('do show')
+  })
+  assert.deepEqual(lines, ['main child do show'])
+})
 
-test("can override inherited level", () => {
+test('can override inherited level', () => {
   const lines = stdNout(() => {
-    childLogger.level = 3;
-    childLogger.debug("no longer shows");
-    logger.debug("still shows");
-  });
-  assert.deepEqual(lines, ["main still shows"]);
-});
+    childLogger.level = 3
+    childLogger.debug('no longer shows')
+    logger.debug('still shows')
+  })
+  assert.deepEqual(lines, ['main still shows'])
+})
 
-test("can change default of logger", () => {
+test('can change default of logger', () => {
   const lines = stdNout(() => {
-    logger.debug("still shows");
-    logger.levels.debug = 10;
-    logger.debug("no longer shows");
-    logger.levels.debug = 4;
-  });
-  assert.deepEqual(lines, ["main still shows"]);
-});
+    logger.debug('still shows')
+    logger.levels.debug = 10
+    logger.debug('no longer shows')
+    logger.levels.debug = 4
+  })
+  assert.deepEqual(lines, ['main still shows'])
+})
 
-test("inherits defaults", () => {
+test('inherits defaults', () => {
   const lines = stdNout(() => {
-    childLogger.debug("no longer shows");
-  });
-  assert.deepEqual(lines, []);
-});
+    childLogger.debug('no longer shows')
+  })
+  assert.deepEqual(lines, [])
+})
 
 test('new logger is its own root', () => {
   assert.equal(logger.root, logger)
 })
 
-test("children can find root", () => {
-  assert.equal(childLogger.root, logger);
-  assert.equal(grandchildLogger.root, logger);
-});
+test('children can find root', () => {
+  assert.equal(childLogger.root, logger)
+  assert.equal(grandchildLogger.root, logger)
+})
 
 test('new parent is its own root', () => {
   assert.equal(parentLogger.root, parentLogger)
 })
 
-test("can filter by string", () => {
+test('can filter by string', () => {
   const lines = stdNout(() => {
-    childLogger.log("show me");
+    childLogger.log('show me')
     childLogger.root.filter = 'grandchild'
-    childLogger.log("im filtered out");
+    childLogger.log('im filtered out')
     grandchildLogger.log('i can still post')
-  });
+  })
   childLogger.root.filter = null
-  assert.deepEqual(lines, ['main child show me', 'main child grandchild i can still post'])
-});
+  assert.deepEqual(lines, [
+    'main child show me',
+    'main child grandchild i can still post',
+  ])
+})
 
-test("can filter by function", () => {
+test('can filter by function', () => {
   const lines = stdNout(() => {
-    childLogger.log("show me");
+    childLogger.log('show me')
     childLogger.root.filter = prefixes => prefixes.includes('grandchild')
-    childLogger.log("im filtered out");
+    childLogger.log('im filtered out')
     grandchildLogger.log('i can still post')
-  });
-  
+  })
+
   childLogger.root.filter = () => true
-  assert.deepEqual(lines, ['main child show me', 'main child grandchild i can still post'])
-});
+  assert.deepEqual(lines, [
+    'main child show me',
+    'main child grandchild i can still post',
+  ])
+})
 
 test('can use functions for prefixes', () => {
-  const log = createLogger(method => `[${method.toUpperCase()}]`, '[im scope]');
+  const log = createLogger(method => `[${method.toUpperCase()}]`, '[im scope]')
   const lines = stdNout(() => {
-    log.log("show me");
-  });
+    log.log('show me')
+  })
   assert.deepEqual(lines, ['[LOG] [im scope] show me'])
 })
 
@@ -140,8 +146,5 @@ test('can create custom methods', () => {
     childLogger.levels.silly = 1
     childLogger.silly("I'm visible")
   })
-  assert.deepEqual(lines, [
-    "main child I'm visible",
-    "main child I'm visible",
-  ])
+  assert.deepEqual(lines, ["main child I'm visible", "main child I'm visible"])
 })
