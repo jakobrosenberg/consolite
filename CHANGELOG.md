@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/jakobrosenberg/consolite/compare/v0.2.10...v0.3.0) (2022-02-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* ability to declare log method on logger
+
+### Features
+
+* ability to declare log method on logger ([64e175a](https://github.com/jakobrosenberg/consolite/commit/64e175a707a12d1e11305ec6d8e549ed94ceb5fe))
+
+
+### Bug Fixes
+
+* custom log methods weren't inheritable ([b241f85](https://github.com/jakobrosenberg/consolite/commit/b241f856632b0be8568f58efe2f84f1ec047e5e8))
+
 ### [0.2.10](https://github.com/jakobrosenberg/consolite/compare/v0.2.9...v0.2.10) (2022-01-07)
 
 
