@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/jakobrosenberg/consolite/compare/v0.3.0...v0.3.1) (2022-02-10)
+
+
+### Features
+
+* added delimiters ([9249d21](https://github.com/jakobrosenberg/consolite/commit/9249d2157b274262bf95cda19a1eb2a1f01934cb))
+
 ## [0.3.0](https://github.com/jakobrosenberg/consolite/compare/v0.2.10...v0.3.0) (2022-02-09)
 
 
