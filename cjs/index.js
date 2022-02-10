@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createProxy = exports.createLogger = exports.Consolite = void 0;
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -24,6 +26,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+// todo delimiter
 
 /**
  * @callback Filter
@@ -84,11 +88,14 @@ var ExtendConsole = /*#__PURE__*/function () {
 
     _defineProperty(this, "_prefix", []);
 
+    _defineProperty(this, "_delimiter", null);
+
     _defineProperty(this, "logMethods",
     /** @type {Console} */
     {});
 
     _defineProperty(this, "levels", new Proxy(this._levels, {
+      // todo could be cleaner. Might not need proxy
       ownKeys: function ownKeys(target) {
         var _this$parent;
 
@@ -137,6 +144,21 @@ var ExtendConsole = /*#__PURE__*/function () {
     value: function register(name, fn) {
       this.logMethods[name] = fn;
     }
+    /**
+     * get prop from self or nearest ancestor
+     * @template T
+     * @param {(((T)=>{})|string|symbol)} cb
+     */
+
+  }, {
+    key: "getNearest",
+    value: function getNearest(cb) {
+      var fn = typeof cb === 'string' || _typeof(cb) === 'symbol' ? function (x) {
+        return x[cb];
+      } : cb;
+      var result = fn(this);
+      return result !== null && result !== undefined ? result : this.parent && this.parent.getNearest(fn);
+    }
   }, {
     key: "prefix",
     get: function get() {
@@ -154,11 +176,32 @@ var ExtendConsole = /*#__PURE__*/function () {
       this._prefix = Array.isArray(value) ? value : [value];
     }
   }, {
+    key: "formattedPrefixes",
+    get: function get() {
+      var _this2 = this;
+
+      if (!this.delimiter) return this.prefix;else {
+        var prefixes = [];
+        this.prefix.forEach(function (prefix) {
+          return prefixes.push(prefix, _this2.delimiter);
+        });
+        return prefixes;
+      }
+    }
+  }, {
+    key: "delimiter",
+    get: function get() {
+      return this.getNearest('_delimiter');
+    },
+    set: function set(value) {
+      this._delimiter = value;
+    }
+  }, {
     key: "level",
     get: function get() {
-      var _ref, _this$_level, _this$parent4;
+      var _this$getNearest;
 
-      return (_ref = (_this$_level = this._level) !== null && _this$_level !== void 0 ? _this$_level : (_this$parent4 = this.parent) === null || _this$parent4 === void 0 ? void 0 : _this$parent4.level) !== null && _ref !== void 0 ? _ref : defaults.level;
+      return (_this$getNearest = this.getNearest('_level')) !== null && _this$getNearest !== void 0 ? _this$getNearest : defaults.level;
     },
     set: function set(val) {
       this._level = val;
@@ -166,9 +209,9 @@ var ExtendConsole = /*#__PURE__*/function () {
   }, {
     key: "filter",
     get: function get() {
-      var _ref2, _this$_filter, _this$parent5;
+      var _this$getNearest2;
 
-      return (_ref2 = (_this$_filter = this._filter) !== null && _this$_filter !== void 0 ? _this$_filter : (_this$parent5 = this.parent) === null || _this$parent5 === void 0 ? void 0 : _this$parent5.filter) !== null && _ref2 !== void 0 ? _ref2 : defaults.filter;
+      return (_this$getNearest2 = this.getNearest('_filter')) !== null && _this$getNearest2 !== void 0 ? _this$getNearest2 : defaults.filter;
     },
     set: function set(val) {
       this._filter = val;
@@ -182,9 +225,9 @@ var ExtendConsole = /*#__PURE__*/function () {
   }, {
     key: "root",
     get: function get() {
-      var _this$parent6;
+      var _this$parent4;
 
-      return ((_this$parent6 = this.parent) === null || _this$parent6 === void 0 ? void 0 : _this$parent6.root) || this;
+      return ((_this$parent4 = this.parent) === null || _this$parent4 === void 0 ? void 0 : _this$parent4.root) || this;
     }
   }, {
     key: "createChild",
@@ -214,19 +257,11 @@ var createProxy = function createProxy(parent, prefix) {
   new Proxy(extendedConsole, {
     get: function get(target, prop) {
       if (Reflect.has(target, prop)) return Reflect.get(target, prop);
-      var fnContext = target;
-      var fn = target.logMethods[prop];
-
-      while (!fn && fnContext) {
-        var _fnContext;
-
-        fnContext = fnContext.parent;
-        fn = (_fnContext = fnContext) === null || _fnContext === void 0 ? void 0 : _fnContext.logMethods[prop];
-      }
+      var fn = target.getNearest(function (t) {
+        return t.logMethods[prop];
+      });
 
       if (fn) {
-        var _fn;
-
         var withinLevel = function withinLevel(prop) {
           return target.levels[prop] <= target.level;
         };
@@ -237,10 +272,10 @@ var createProxy = function createProxy(parent, prefix) {
 
         var canBind = typeof fn === 'function';
         var shouldPrint = withinLevel(prop) && passesFilter() && canBind;
-        var prefixes = target.prefix.map(function (p) {
+        var prefixes = target.formattedPrefixes.map(function (p) {
           return typeof p === 'string' ? p : p(prop);
         });
-        return shouldPrint ? (_fn = fn).bind.apply(_fn, [console].concat(_toConsumableArray(prefixes))) : noop;
+        return shouldPrint ? fn.bind.apply(fn, [console].concat(_toConsumableArray(prefixes))) : noop;
       }
     },
     set: function set(target, prop, value) {
@@ -259,12 +294,9 @@ var createProxy = function createProxy(parent, prefix) {
     },
     getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, prop) {
       if (Reflect.get(target, prop)) return Object.getOwnPropertyDescriptor(target, prop);
-      var parent = target;
-
-      while (parent) {
-        if (Reflect.get(parent.logMethods, prop)) return Object.getOwnPropertyDescriptor(parent.logMethods, prop);
-        parent = parent.parent;
-      }
+      return parent.getNearest(function (t) {
+        return Object.getOwnPropertyDescriptor(t.logMethods, prop);
+      }) || undefined;
     }
   });
   return proxy;

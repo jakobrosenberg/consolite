@@ -34,11 +34,21 @@ declare class ExtendConsole {
     _level: any;
     _levels: {};
     _prefix: any[];
+    _delimiter: any;
     logMethods: Console;
     parent: any;
     register(name: any, fn: any): void;
+    /**
+     * get prop from self or nearest ancestor
+     * @template T
+     * @param {(((T)=>{})|string|symbol)} cb
+     */
+    getNearest<T>(cb: string | symbol | ((T: any) => {})): any;
     set prefix(arg: any[]);
     get prefix(): any[];
+    get formattedPrefixes(): any[];
+    set delimiter(arg: any);
+    get delimiter(): any;
     set level(arg: any);
     get level(): any;
     set filter(arg: any);
