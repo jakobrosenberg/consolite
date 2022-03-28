@@ -6,15 +6,12 @@
  */
 
 /**
- * @typedef {Object} Logger
- * @prop {createLogger} create Creates new logger.
- * @prop {createLogger} createChild Creates a child logger. Prefix will be inherited. Level and levels will be inherited if undefined.
- * @prop {createLogger} createParent Creates a parent logger. Prefix will be inherited. Level and levels will be inherited if undefined.
- * @prop {Object.<string, number>} levels
- * @prop {number} level
- * @prop {Filter|string|RegExp} filter
- * @prop {Logger} root
- * @prop {Logger} parent
+ * @typedef {Object} ConsoliteOptions
+ * @prop {Object<string, (...prefix)=>string>=} methods
+ */
+
+/**
+ * @typedef {PrefixFn|string} Prefix
  */
 
 const defaults = {
@@ -44,8 +41,14 @@ class ExtendConsole {
   _delimiter = null
   logMethods = /** @type {Console} */ ({})
 
-  constructor(parent, prefix) {
+  /**
+   * @param {ExtendConsole} parent
+   * @param {ConsoliteOptions} options
+   * @param {Prefix[]} prefix
+   */
+  constructor(parent, options, prefix) {
     this.parent = parent
+    this.options = options
     if (!parent) this.logMethods = console
     this._prefix = prefix
     Object.defineProperties(this, {
@@ -54,6 +57,20 @@ class ExtendConsole {
       _levels: { enumerable: false },
       _prefix: { enumerable: false },
     })
+  }
+
+  /**
+   * @template {ConsoliteOptions}  T
+   * @template {ConsoliteOptions extends Object ? T['methods'] : ConsoliteOptions['methods']} Methods
+   * @param {T | Prefix} optsOrPrefix
+   * @param  {...Prefix} prefix
+   * @returns {ConsoliteLogger<this, Methods>}
+   */
+  createChild(optsOrPrefix, ...prefix) {
+    const hasOptions = typeof optsOrPrefix === 'object'
+    const options = hasOptions ? optsOrPrefix : {}
+    if (!hasOptions) prefix.unshift(optsOrPrefix)
+    return createProxy(this, options, prefix)
   }
 
   register(name, fn) {
@@ -74,6 +91,7 @@ class ExtendConsole {
   }
 
   get prefix() {
+    /** @type {ExtendConsole} */
     let parent = this
     const accumulatedPrefixes = [...this._prefix]
     while ((parent = parent.parent)) accumulatedPrefixes.unshift(...parent._prefix)
@@ -114,7 +132,6 @@ class ExtendConsole {
     this._filter = val
   }
   get __self() {
-    // logger = proxied object, logger.__self = original object
     return this
   }
   get root() {
@@ -143,23 +160,19 @@ class ExtendConsole {
       defaults.levels.default,
     set: (target, prop, value) => (target[prop] = value),
   })
-
-  createChild(...prefix) {
-    return createProxy(this, prefix)
-  }
-
-  create = createLogger
 }
 
 /**
- *
- * @param {ExtendConsole} parent
+ * @template {ConsoliteOptions} O
+ * @template {ExtendConsole} P
+ * @param {P} parent
+ * @param {O | null} options
  * @param {(string|PrefixFn)[]} prefix
- * @returns {ConsoliteLogger}
+ * @returns {ConsoliteLogger<P, Console & O['methods']>}
  */
-export const createProxy = (parent, prefix) => {
-  const extendedConsole = new ExtendConsole(parent, prefix)
-  const proxy = /** @type {ConsoliteLogger} */ (
+export const createProxy = (parent, options, prefix) => {
+  const extendedConsole = new ExtendConsole(parent, {}, prefix)
+  const proxy = /** @type {ConsoliteLogger<P, Console & O['methods']>} */ (
     new Proxy(extendedConsole, {
       get(target, prop) {
         if (Reflect.has(target, prop)) return Reflect.get(target, prop)
@@ -175,7 +188,9 @@ export const createProxy = (parent, prefix) => {
 
           const canBind = typeof fn === 'function'
           const shouldPrint = withinLevel(prop) && passesFilter() && canBind
-          const prefixes = target.formattedPrefixes.map(p => (typeof p === 'string' ? p : p(prop)))
+          const prefixes = target.formattedPrefixes.map(p =>
+            typeof p === 'string' ? p : p(prop),
+          )
 
           return shouldPrint ? fn.bind(console, ...prefixes) : noop
         }
@@ -211,19 +226,28 @@ export const createProxy = (parent, prefix) => {
  * @param {string|symbol} method console method, eg. log, debug etc...
  */
 
-/** @typedef {ExtendConsole & Console} ConsoliteLogger */
+/**
+ * @template {ExtendConsole} Parent
+ * @template {ConsoliteOptions['methods']} Methods
+ * @typedef {Parent & Methods} ConsoliteLogger
+ **/
 
 /**
+ * @template {ConsoliteOptions} O
+ * @template {ExtendConsole} P
+ * @param {O | Prefix} optsOrPrefix
  * @param {(string|PrefixFn)[]} prefix
- * @returns {ConsoliteLogger}
+ * @returns {ConsoliteLogger<P, Console & O['methods']>}
  */
-export const createLogger = (...prefix) => {
-  return createProxy(null, prefix)
+export const createLogger = (optsOrPrefix, ...prefix) => {
+  const hasOptions = typeof optsOrPrefix === 'object'
+  const options = hasOptions ? optsOrPrefix : {}
+  if (!hasOptions) prefix.unshift(optsOrPrefix)
+  return createProxy(this, options, prefix)
 }
 
-/** @type {ConsoliteLogger} */
 export class Consolite {
-  constructor(...prefix) {
-    return createLogger(...prefix)
+  constructor(optsOrPrefix, ...prefix) {
+    return createLogger(optsOrPrefix, ...prefix)
   }
 }

@@ -1,49 +1,50 @@
-export function createProxy(parent: ExtendConsole, prefix: (string | PrefixFn)[]): ConsoliteLogger;
-export function createLogger(...prefix: (string | PrefixFn)[]): ConsoliteLogger;
-/** @type {ConsoliteLogger} */
+export function createProxy<O extends ConsoliteOptions, P extends ExtendConsole>(parent: P, options: O, prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
+export function createLogger<O extends ConsoliteOptions, P extends ExtendConsole>(optsOrPrefix: Prefix | O, ...prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
 export class Consolite {
-    constructor(...prefix: any[]);
+    constructor(optsOrPrefix: any, ...prefix: any[]);
 }
 export type Filter = (prefixes: string[]) => any;
-export type Logger = {
-    /**
-     * Creates new logger.
-     */
-    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
-    /**
-     * Creates a child logger. Prefix will be inherited. Level and levels will be inherited if undefined.
-     */
-    createChild: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
-    /**
-     * Creates a parent logger. Prefix will be inherited. Level and levels will be inherited if undefined.
-     */
-    createParent: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
-    levels: {
-        [x: string]: number;
+export type ConsoliteOptions = {
+    methods?: {
+        [x: string]: (...prefix: any[]) => string;
     };
-    level: number;
-    filter: Filter | string | RegExp;
-    root: Logger;
-    parent: Logger;
 };
+export type Prefix = PrefixFn | string;
 export type PrefixFn = (method: string | symbol) => any;
-export type ConsoliteLogger = ExtendConsole & Console;
+export type ConsoliteLogger<Parent extends ExtendConsole, Methods extends {
+    [x: string]: (...prefix: any[]) => string;
+}> = Parent & Methods;
 declare class ExtendConsole {
-    constructor(parent: any, prefix: any);
+    /**
+     *
+     * @param {ExtendConsole} parent
+     * @param {ConsoliteOptions} options
+     * @param {Prefix[]} prefix
+     */
+    constructor(parent: ExtendConsole, options: ConsoliteOptions, prefix: Prefix[]);
     _filter: any;
     _level: any;
     _levels: {};
     _prefix: any[];
     _delimiter: any;
     logMethods: Console;
-    parent: any;
+    parent: ExtendConsole;
+    options: ConsoliteOptions;
+    /**
+     * @template {ConsoliteOptions}  T
+     * @template {ConsoliteOptions extends Object ? T['methods'] : ConsoliteOptions['methods']} Methods
+     * @param {T | Prefix} optsOrPrefix
+     * @param  {...Prefix} prefix
+     * @returns {ConsoliteLogger<this, Methods>}
+     */
+    createChild<T extends ConsoliteOptions, Methods extends T["methods"]>(optsOrPrefix: Prefix | T, ...prefix: Prefix[]): ConsoliteLogger<ExtendConsole, Methods>;
     register(name: any, fn: any): void;
     /**
      * get prop from self or nearest ancestor
      * @template T
      * @param {(((T)=>{})|string|symbol)} cb
      */
-    getNearest<T>(cb: string | symbol | ((T: any) => {})): any;
+    getNearest<T_1>(cb: string | symbol | ((T: any) => {})): any;
     set prefix(arg: any[]);
     get prefix(): any[];
     get formattedPrefixes(): any[];
@@ -55,8 +56,6 @@ declare class ExtendConsole {
     get filter(): any;
     get __self(): ExtendConsole;
     get root(): any;
-    levels: {};
-    createChild(...prefix: any[]): ConsoliteLogger;
-    create: (...prefix: (string | PrefixFn)[]) => ConsoliteLogger;
+    levels: any;
 }
 export {};
