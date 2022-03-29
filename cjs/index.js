@@ -38,7 +38,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /**
  * @typedef {Object} ConsoliteOptions
- * @prop {Object<string, (...prefix)=>string>=} methods
+ * @prop {Object<string, function>=} methods
  */
 
 /**
@@ -75,7 +75,6 @@ var escapeIfString = function escapeIfString(str) {
 
 var ExtendConsole = /*#__PURE__*/function () {
   /**
-   *
    * @param {ExtendConsole} parent
    * @param {ConsoliteOptions} options
    * @param {Prefix[]} prefix

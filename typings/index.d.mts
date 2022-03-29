@@ -6,17 +6,16 @@ export class Consolite {
 export type Filter = (prefixes: string[]) => any;
 export type ConsoliteOptions = {
     methods?: {
-        [x: string]: (...prefix: any[]) => string;
-    };
+        [x: string]: Function;
+    } | undefined;
 };
 export type Prefix = PrefixFn | string;
 export type PrefixFn = (method: string | symbol) => any;
 export type ConsoliteLogger<Parent extends ExtendConsole, Methods extends {
-    [x: string]: (...prefix: any[]) => string;
+    [x: string]: Function;
 }> = Parent & Methods;
 declare class ExtendConsole {
     /**
-     *
      * @param {ExtendConsole} parent
      * @param {ConsoliteOptions} options
      * @param {Prefix[]} prefix

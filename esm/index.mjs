@@ -7,7 +7,7 @@
 
 /**
  * @typedef {Object} ConsoliteOptions
- * @prop {Object<string, (...prefix)=>string>=} methods
+ * @prop {Object<string, function>=} methods
  */
 
 /**
