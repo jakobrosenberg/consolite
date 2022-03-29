@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/jakobrosenberg/consolite/compare/v0.3.3...v0.3.5) (2022-03-29)
+
+
+### Bug Fixes
+
+* bad function signature ([b9d891d](https://github.com/jakobrosenberg/consolite/commit/b9d891d20f19a70e3713f5265cd11c450e0bb348))
+* types for child loggers ([9b829d5](https://github.com/jakobrosenberg/consolite/commit/9b829d540333751f03fa89c320327440444fcdb2))
+
 ### [0.3.4](https://github.com/jakobrosenberg/consolite/compare/v0.3.3...v0.3.4) (2022-03-29)
 
 
