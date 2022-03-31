@@ -182,3 +182,37 @@ test('can use delimiters', () => {
   })
   assert.deepEqual(lines, ['main > child > grandchild > hello'])
 })
+
+test('can create custom functions', () => {
+  const loggerWithCustomFn = createLogger({ methods: { traceShort: console.log } })
+  const lines = stdNout(() => {
+    loggerWithCustomFn.traceShort('hello')
+  })
+  assert.deepEqual(lines, ['hello'])
+
+  test('can inherit custom functions', () => {
+    const child = loggerWithCustomFn.createChild()
+    const lines = stdNout(() => {
+      child.traceShort('hello from child')
+    })
+    assert.deepEqual(lines, ['hello from child'])
+  })
+
+  test('child can have own custom function', () => {
+    const child = loggerWithCustomFn.createChild({ methods: { traceDebug: console.log } })
+    const lines = stdNout(() => {
+      child.traceShort('hello from child fn')
+    })
+    assert.deepEqual(lines, ['hello from child fn'])
+
+    test('parent cant inherit from child', () => {
+      let err
+      try {
+        loggerWithCustomFn.traceDebug('I should fail')
+      } catch (_err) {
+        err = _err.toString()
+      }
+      assert.equal(err, 'TypeError: loggerWithCustomFn.traceDebug is not a function')
+    })
+  })
+})

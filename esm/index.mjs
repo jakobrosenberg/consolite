@@ -50,6 +50,7 @@ class ExtendConsole {
     this.parent = parent
     this.options = options
     if (!parent) this.logMethods = console
+    Object.assign(this.logMethods, options?.methods)
     this._prefix = prefix
     Object.defineProperties(this, {
       _filter: { enumerable: false },
@@ -62,14 +63,14 @@ class ExtendConsole {
   /**
    * @template {ConsoliteOptions}  T
    * @template {ConsoliteOptions extends Object ? T['methods'] : ConsoliteOptions['methods']} Methods
-   * @param {T | Prefix} optsOrPrefix
+   * @param {T | Prefix=} optsOrPrefix
    * @param  {...Prefix} prefix
    * @returns {ConsoliteLogger<this, Methods>}
    */
   createChild(optsOrPrefix, ...prefix) {
     const hasOptions = typeof optsOrPrefix === 'object'
     const options = hasOptions ? optsOrPrefix : {}
-    if (!hasOptions) prefix.unshift(optsOrPrefix)
+    if (!hasOptions && optsOrPrefix) prefix.unshift(optsOrPrefix)
     return createProxy(this, options, prefix)
   }
 
@@ -171,7 +172,7 @@ class ExtendConsole {
  * @returns {ConsoliteLogger<P, Console & O['methods']>}
  */
 export const createProxy = (parent, options, prefix) => {
-  const extendedConsole = new ExtendConsole(parent, {}, prefix)
+  const extendedConsole = new ExtendConsole(parent, options, prefix)
   const proxy = /** @type {ConsoliteLogger<P, Console & O['methods']>} */ (
     new Proxy(extendedConsole, {
       get(target, prop) {
@@ -242,7 +243,7 @@ export const createProxy = (parent, options, prefix) => {
 export const createLogger = (optsOrPrefix, ...prefix) => {
   const hasOptions = typeof optsOrPrefix === 'object'
   const options = hasOptions ? optsOrPrefix : {}
-  if (!hasOptions) prefix.unshift(optsOrPrefix)
+  if (!hasOptions && optsOrPrefix) prefix.unshift(optsOrPrefix)
   return createProxy(this, options, prefix)
 }
 

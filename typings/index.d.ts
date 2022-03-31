@@ -32,11 +32,11 @@ declare class ExtendConsole {
     /**
      * @template {ConsoliteOptions}  T
      * @template {ConsoliteOptions extends Object ? T['methods'] : ConsoliteOptions['methods']} Methods
-     * @param {T | Prefix} optsOrPrefix
+     * @param {T | Prefix=} optsOrPrefix
      * @param  {...Prefix} prefix
      * @returns {ConsoliteLogger<this, Methods>}
      */
-    createChild<T extends ConsoliteOptions, Methods extends T["methods"]>(optsOrPrefix: Prefix | T, ...prefix: Prefix[]): ConsoliteLogger<ExtendConsole, Methods>;
+    createChild<T extends ConsoliteOptions, Methods extends T["methods"]>(optsOrPrefix?: Prefix | T, ...prefix: Prefix[]): ConsoliteLogger<ExtendConsole, Methods>;
     register(name: any, fn: any): void;
     /**
      * get prop from self or nearest ancestor

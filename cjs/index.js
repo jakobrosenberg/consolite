@@ -125,6 +125,7 @@ var ExtendConsole = /*#__PURE__*/function () {
     this.parent = parent;
     this.options = options;
     if (!parent) this.logMethods = console;
+    Object.assign(this.logMethods, options === null || options === void 0 ? void 0 : options.methods);
     this._prefix = prefix;
     Object.defineProperties(this, {
       _filter: {
@@ -144,7 +145,7 @@ var ExtendConsole = /*#__PURE__*/function () {
   /**
    * @template {ConsoliteOptions}  T
    * @template {ConsoliteOptions extends Object ? T['methods'] : ConsoliteOptions['methods']} Methods
-   * @param {T | Prefix} optsOrPrefix
+   * @param {T | Prefix=} optsOrPrefix
    * @param  {...Prefix} prefix
    * @returns {ConsoliteLogger<this, Methods>}
    */
@@ -160,7 +161,7 @@ var ExtendConsole = /*#__PURE__*/function () {
         prefix[_key - 1] = arguments[_key];
       }
 
-      if (!hasOptions) prefix.unshift(optsOrPrefix);
+      if (!hasOptions && optsOrPrefix) prefix.unshift(optsOrPrefix);
       return createProxy(this, options, prefix);
     }
   }, {
@@ -268,7 +269,7 @@ var ExtendConsole = /*#__PURE__*/function () {
 
 
 var createProxy = function createProxy(parent, options, prefix) {
-  var extendedConsole = new ExtendConsole(parent, {}, prefix);
+  var extendedConsole = new ExtendConsole(parent, options, prefix);
   var proxy =
   /** @type {ConsoliteLogger<P, Console & O['methods']>} */
   new Proxy(extendedConsole, {
@@ -348,7 +349,7 @@ var createLogger = function createLogger(optsOrPrefix) {
     prefix[_key2 - 1] = arguments[_key2];
   }
 
-  if (!hasOptions) prefix.unshift(optsOrPrefix);
+  if (!hasOptions && optsOrPrefix) prefix.unshift(optsOrPrefix);
   return createProxy(_this3, options, prefix);
 };
 
