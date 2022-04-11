@@ -236,7 +236,7 @@ export const createProxy = (parent, options, prefix) => {
 /**
  * @template {ConsoliteOptions} O
  * @template {ExtendConsole} P
- * @param {O | Prefix} optsOrPrefix
+ * @param {O | Prefix=} optsOrPrefix
  * @param {(string|PrefixFn)[]} prefix
  * @returns {ConsoliteLogger<P, Console & O['methods']>}
  */
