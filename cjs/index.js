@@ -9,6 +9,10 @@ var _this3 = void 0;
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -124,7 +128,7 @@ var ExtendConsole = /*#__PURE__*/function () {
 
     this.parent = parent;
     this.options = options;
-    if (!parent) this.logMethods = console;
+    if (!parent) this.logMethods = _objectSpread({}, console);
     Object.assign(this.logMethods, options === null || options === void 0 ? void 0 : options.methods);
     this._prefix = prefix;
     Object.defineProperties(this, {
@@ -333,7 +337,7 @@ var createProxy = function createProxy(parent, options, prefix) {
 /**
  * @template {ConsoliteOptions} O
  * @template {ExtendConsole} P
- * @param {O | Prefix} optsOrPrefix
+ * @param {O | Prefix=} optsOrPrefix
  * @param {(string|PrefixFn)[]} prefix
  * @returns {ConsoliteLogger<P, Console & O['methods']>}
  */

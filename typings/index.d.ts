@@ -1,5 +1,5 @@
 export function createProxy<O extends ConsoliteOptions, P extends ExtendConsole>(parent: P, options: O, prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
-export function createLogger<O extends ConsoliteOptions, P extends ExtendConsole>(optsOrPrefix: Prefix | O, ...prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
+export function createLogger<O extends ConsoliteOptions, P extends ExtendConsole>(optsOrPrefix?: Prefix | O, ...prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
 export class Consolite {
     constructor(optsOrPrefix: any, ...prefix: any[]);
 }
