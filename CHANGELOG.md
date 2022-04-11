@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.8](https://github.com/jakobrosenberg/consolite/compare/v0.3.7...v0.3.8) (2022-04-11)
+
+
+### Bug Fixes
+
+* missing build for cjs ([95b1c55](https://github.com/jakobrosenberg/consolite/commit/95b1c55f1ff7c9acf3d64ebb035e5beea10382aa))
+
 ### [0.3.7](https://github.com/jakobrosenberg/consolite/compare/v0.3.6...v0.3.7) (2022-04-11)
 
 

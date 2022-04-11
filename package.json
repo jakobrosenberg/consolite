@@ -1,6 +1,6 @@
 {
   "name": "consolite",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Light wrapper for console",
   "main": "./cjs/index.js",
   "module": "./esm/index.mjs",
