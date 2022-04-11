@@ -49,7 +49,7 @@ class ExtendConsole {
   constructor(parent, options, prefix) {
     this.parent = parent
     this.options = options
-    if (!parent) this.logMethods = console
+    if (!parent) this.logMethods = { ...console }
     Object.assign(this.logMethods, options?.methods)
     this._prefix = prefix
     Object.defineProperties(this, {

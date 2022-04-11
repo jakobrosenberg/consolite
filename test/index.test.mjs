@@ -216,3 +216,19 @@ test('can create custom functions', () => {
     })
   })
 })
+
+test('can overwrite native functions', () => {
+  const logger = createLogger({
+    methods: {
+      info: str => {
+        console.log('custom info: ' + str)
+      },
+    },
+  })
+
+  const lines = stdNout(() => {
+    logger.info('hello world')
+  })
+
+  assert.equal(lines.join(), 'custom info: hello world')
+})
