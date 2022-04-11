@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/jakobrosenberg/consolite/compare/v0.3.6...v0.3.7) (2022-04-11)
+
+
+### Bug Fixes
+
+* option or prefix type was not set to optional ([685afd2](https://github.com/jakobrosenberg/consolite/commit/685afd2f79bc8487001ba64525b2e48fa03c5f2e))
+* overwriting native methods didnt always work ([84d2a90](https://github.com/jakobrosenberg/consolite/commit/84d2a90e2ecd4943e15b8baac2c3e74732282f34))
+
 ### [0.3.6](https://github.com/jakobrosenberg/consolite/compare/v0.3.5...v0.3.6) (2022-03-31)
 
 
