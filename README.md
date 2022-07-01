@@ -73,3 +73,9 @@ log.register('silly', console.log)
 log.levels.silly = 8
 log.silly('hello world')
 ```
+
+### Filtering messages
+```javascript
+const log = createLog()
+log.filter = (prefixes, method) => method !== 'debug' || process.env.DEBUG
+```

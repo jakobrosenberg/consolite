@@ -54,6 +54,6 @@
     "typescript": "^4.6.0-dev.20211104"
   },
   "dependencies": {
-    "probs": "^1.0.0-3"
+    "probs": "^1.1.0-17"
   }
 }

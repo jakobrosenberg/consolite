@@ -93,14 +93,18 @@ test('can filter by string', () => {
 test('can filter by function', () => {
   const lines = stdNout(() => {
     childLogger.log('show me')
-    childLogger.root.filter = prefixes => prefixes.includes('grandchild')
+    childLogger.info('show me too')
+    childLogger.root.filter = (prefixes, method) =>
+      prefixes.includes('grandchild') && method === 'log'
     childLogger.log('im filtered out')
     grandchildLogger.log('i can still post')
+    grandchildLogger.info('i cannot post. ') // filtered method
   })
 
   childLogger.root.filter = () => true
   assert.deepEqual(lines, [
     'main child show me',
+    'main child show me too',
     'main child grandchild i can still post',
   ])
 })

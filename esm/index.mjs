@@ -184,7 +184,7 @@ export const createProxy = (parent, options, prefix) => {
           const withinLevel = prop => target.levels[prop] <= target.level
           const passesFilter = () =>
             typeof target.filter === 'function'
-              ? target.filter(target.prefix)
+              ? target.filter(target.prefix, prop)
               : target.prefix.join('').match(escapeIfString(target.filter))
 
           const canBind = typeof fn === 'function'
