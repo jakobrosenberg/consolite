@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.9](https://github.com/jakobrosenberg/consolite/compare/v0.3.8...v0.3.9) (2022-07-01)
+
+
+### Features
+
+* added method filter ([8bb5a7e](https://github.com/jakobrosenberg/consolite/commit/8bb5a7edadeed59a8dcd2df33eb0780dcf88803a))
+
 ### [0.3.8](https://github.com/jakobrosenberg/consolite/compare/v0.3.7...v0.3.8) (2022-04-11)
 
 
