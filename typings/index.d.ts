@@ -1,20 +1,4 @@
-export function createProxy<O extends ConsoliteOptions, P extends ExtendConsole>(parent: P, options: O, prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
-export function createLogger<O extends ConsoliteOptions, P extends ExtendConsole>(optsOrPrefix?: Prefix | O, ...prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
-export class Consolite {
-    constructor(optsOrPrefix: any, ...prefix: any[]);
-}
-export type Filter = (prefixes: string[]) => any;
-export type ConsoliteOptions = {
-    methods?: {
-        [x: string]: Function;
-    } | undefined;
-};
-export type Prefix = PrefixFn | string;
-export type PrefixFn = (method: string | symbol) => any;
-export type ConsoliteLogger<Parent extends ExtendConsole, Methods extends {
-    [x: string]: Function;
-}> = Parent & Methods;
-declare class ExtendConsole {
+export class ExtendConsole {
     /**
      * @param {ExtendConsole} parent
      * @param {ConsoliteOptions} options
@@ -57,4 +41,19 @@ declare class ExtendConsole {
     get root(): any;
     levels: any;
 }
-export {};
+export function createProxy<O extends ConsoliteOptions, P extends ExtendConsole>(parent: P, options: O, prefix: (string | PrefixFn)[]): ConsoliteLogger<P, Console & O["methods"]>;
+export function createLogger<O extends ConsoliteOptions>(optsOrPrefix?: Prefix | O, ...prefix: (string | PrefixFn)[]): ConsoliteLogger<ExtendConsole, Console & O["methods"]>;
+export class Consolite {
+    constructor(optsOrPrefix: any, ...prefix: any[]);
+}
+export type Filter = (prefixes: string[]) => any;
+export type ConsoliteOptions = {
+    methods?: {
+        [x: string]: Function;
+    } | undefined;
+};
+export type Prefix = PrefixFn | string;
+export type PrefixFn = (method: string | symbol) => any;
+export type ConsoliteLogger<Parent extends ExtendConsole, Methods extends {
+    [x: string]: Function;
+}> = Parent & Methods;

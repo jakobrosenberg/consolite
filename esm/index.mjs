@@ -33,7 +33,7 @@ const unique = (v, i, a) => a.indexOf(v) === i
 const escapeRegExp = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str)
 
-class ExtendConsole {
+export class ExtendConsole {
   _filter = null
   _level = null
   _levels = {}
@@ -235,10 +235,9 @@ export const createProxy = (parent, options, prefix) => {
 
 /**
  * @template {ConsoliteOptions} O
- * @template {ExtendConsole} P
  * @param {O | Prefix=} optsOrPrefix
  * @param {(string|PrefixFn)[]} prefix
- * @returns {ConsoliteLogger<P, Console & O['methods']>}
+ * @returns {ConsoliteLogger<ExtendConsole, Console & O['methods']>}
  */
 export const createLogger = (optsOrPrefix, ...prefix) => {
   const hasOptions = typeof optsOrPrefix === 'object'
