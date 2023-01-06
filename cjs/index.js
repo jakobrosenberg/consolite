@@ -78,6 +78,8 @@ var escapeIfString = function escapeIfString(str) {
 };
 
 var ExtendConsole = /*#__PURE__*/function () {
+  /** @type {number | (()=>number)} */
+
   /**
    * @param {ExtendConsole} parent
    * @param {ConsoliteOptions} options
@@ -205,6 +207,8 @@ var ExtendConsole = /*#__PURE__*/function () {
     set: function set(value) {
       this._prefix = Array.isArray(value) ? value : [value];
     }
+    /** @type {number | (()=>number)} */
+
   }, {
     key: "formattedPrefixes",
     get: function get() {
@@ -231,8 +235,11 @@ var ExtendConsole = /*#__PURE__*/function () {
     get: function get() {
       var _this$getNearest;
 
-      return (_this$getNearest = this.getNearest('_level')) !== null && _this$getNearest !== void 0 ? _this$getNearest : defaults.level;
-    },
+      var level = (_this$getNearest = this.getNearest('_level')) !== null && _this$getNearest !== void 0 ? _this$getNearest : defaults.level;
+      return typeof level === 'function' ? level() : level;
+    }
+    /** @type {number | (()=>number)} */
+    ,
     set: function set(val) {
       this._level = val;
     }

@@ -34,6 +34,19 @@ test('can set level', () => {
   assert.deepEqual(lines, ['main do show'])
 })
 
+test('level can be a callback', () => {
+  const levelCb = () => 4
+  logger.level = 1
+  const lines = stdNout(() => {
+    logger.debug('no show')
+    logger.level = levelCb
+    logger.debug('do show')
+  })
+  // @ts-ignore
+  assert.equal(logger._level(), 4)
+  assert.deepEqual(lines, ['main do show'])
+})
+
 test('inherits level', () => {
   const lines = stdNout(() => {
     childLogger.debug('do show')

@@ -6,7 +6,8 @@ export class ExtendConsole {
      */
     constructor(parent: ExtendConsole, options: ConsoliteOptions, prefix: Prefix[]);
     _filter: any;
-    _level: any;
+    /** @type {number | (()=>number)} */
+    _level: number | (() => number);
     _levels: {};
     _prefix: any[];
     _delimiter: any;
@@ -33,8 +34,10 @@ export class ExtendConsole {
     get formattedPrefixes(): any[];
     set delimiter(arg: any);
     get delimiter(): any;
-    set level(arg: any);
-    get level(): any;
+    /** @type {number | (()=>number)} */
+    set level(arg: number | (() => number));
+    /** @type {number | (()=>number)} */
+    get level(): number | (() => number);
     set filter(arg: any);
     get filter(): any;
     get __self(): ExtendConsole;

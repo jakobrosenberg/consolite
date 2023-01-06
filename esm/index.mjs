@@ -35,6 +35,7 @@ const escapeIfString = str => (typeof str === 'string' ? escapeRegExp(str) : str
 
 export class ExtendConsole {
   _filter = null
+  /** @type {number | (()=>number)} */
   _level = null
   _levels = {}
   _prefix = []
@@ -120,9 +121,13 @@ export class ExtendConsole {
     this._prefix = Array.isArray(value) ? value : [value]
   }
 
+  /** @type {number | (()=>number)} */
   get level() {
-    return this.getNearest('_level') ?? defaults.level
+    const level = this.getNearest('_level') ?? defaults.level
+    return typeof level === 'function' ? level() : level
   }
+
+  /** @type {number | (()=>number)} */
   set level(val) {
     this._level = val
   }
