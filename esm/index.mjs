@@ -8,6 +8,9 @@
 /**
  * @typedef {Object} ConsoliteOptions
  * @prop {Object<string, function>=} methods
+ * @prop {function=} filter
+ * @prop {(number | (()=>number))=} level
+ * @prop {Object<string, number>=} levels
  */
 
 /**
@@ -218,7 +221,7 @@ export const createProxy = (parent, options, prefix) => {
           return Object.getOwnPropertyDescriptor(target, prop)
 
         return (
-          parent.getNearest(t => Object.getOwnPropertyDescriptor(t.logMethods, prop)) ||
+          (parent && parent.getNearest(t => Object.getOwnPropertyDescriptor(t.logMethods, prop))) ||
           undefined
         )
       },
